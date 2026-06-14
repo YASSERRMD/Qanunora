@@ -11,6 +11,7 @@ import { LegislativeModule } from './modules/legislative/legislative.module';
 import { DocumentsModule } from './modules/documents/documents.module';
 import { VersionsModule } from './modules/versions/versions.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
+import { CommitteesModule } from './modules/committees/committees.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { WorkflowModule } from './modules/workflow/workflow.module';
     DocumentsModule,
     VersionsModule,
     WorkflowModule,
+    CommitteesModule,
   ],
   controllers: [AppController],
   providers: [
