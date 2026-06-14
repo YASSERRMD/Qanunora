@@ -12,6 +12,7 @@ import { DocumentsModule } from './modules/documents/documents.module';
 import { VersionsModule } from './modules/versions/versions.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { CommitteesModule } from './modules/committees/committees.module';
+import { AmendmentsModule } from './modules/amendments/amendments.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { CommitteesModule } from './modules/committees/committees.module';
     VersionsModule,
     WorkflowModule,
     CommitteesModule,
+    AmendmentsModule,
   ],
   controllers: [AppController],
   providers: [
