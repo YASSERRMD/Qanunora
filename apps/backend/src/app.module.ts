@@ -22,6 +22,7 @@ import { AiImpactModule } from './modules/ai-impact/ai-impact.module';
 import { RegulatoryMappingModule } from './modules/regulatory-mapping/regulatory-mapping.module';
 import { JurisdictionComparisonModule } from './modules/jurisdiction-comparison/jurisdiction-comparison.module';
 import { TraceabilityModule } from './modules/traceability/traceability.module';
+import { ChangeDetectionModule } from './modules/change-detection/change-detection.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { TraceabilityModule } from './modules/traceability/traceability.module';
     RegulatoryMappingModule,
     JurisdictionComparisonModule,
     TraceabilityModule,
+    ChangeDetectionModule,
   ],
   controllers: [AppController],
   providers: [
