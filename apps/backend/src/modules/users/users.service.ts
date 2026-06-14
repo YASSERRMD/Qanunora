@@ -40,4 +40,9 @@ export class UsersService {
     ]);
     return { data, total };
   }
+
+  async updateRole(id: string, role: import('@prisma/client').UserRole): Promise<import('@prisma/client').User> {
+    await this.findOrThrow(id);
+    return this.prisma.user.update({ where: { id }, data: { role } });
+  }
 }
