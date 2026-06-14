@@ -15,6 +15,7 @@ import { CommitteesModule } from './modules/committees/committees.module';
 import { AmendmentsModule } from './modules/amendments/amendments.module';
 import { LegalStructureModule } from './modules/legal-structure/legal-structure.module';
 import { ConsultationsModule } from './modules/consultations/consultations.module';
+import { StakeholdersModule } from './modules/stakeholders/stakeholders.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ConsultationsModule } from './modules/consultations/consultations.modul
     AmendmentsModule,
     LegalStructureModule,
     ConsultationsModule,
+    StakeholdersModule,
   ],
   controllers: [AppController],
   providers: [
