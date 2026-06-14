@@ -7,6 +7,7 @@ import { DatabaseModule } from './modules/database/database.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import configuration from './config/configuration';
+import { LegislativeModule } from './modules/legislative/legislative.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import configuration from './config/configuration';
     }),
     DatabaseModule,
     AuthModule,
+    LegislativeModule,
   ],
   controllers: [AppController],
   providers: [
