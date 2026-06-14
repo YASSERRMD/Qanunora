@@ -13,14 +13,10 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { AiSummarizationService } from './ai-summarization.service';
 import { SummaryType } from './summary-result.schema';
+import { GenerateSummaryDto } from './dto/summarization.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
-
-class GenerateSummaryDto {
-  summaryType!: SummaryType;
-  provider?: string;
-}
 
 @ApiTags('AI Summarization')
 @ApiBearerAuth()
