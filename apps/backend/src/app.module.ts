@@ -14,6 +14,7 @@ import { WorkflowModule } from './modules/workflow/workflow.module';
 import { CommitteesModule } from './modules/committees/committees.module';
 import { AmendmentsModule } from './modules/amendments/amendments.module';
 import { LegalStructureModule } from './modules/legal-structure/legal-structure.module';
+import { ConsultationsModule } from './modules/consultations/consultations.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { LegalStructureModule } from './modules/legal-structure/legal-structure.
     CommitteesModule,
     AmendmentsModule,
     LegalStructureModule,
+    ConsultationsModule,
   ],
   controllers: [AppController],
   providers: [
