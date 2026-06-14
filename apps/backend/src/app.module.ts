@@ -23,6 +23,7 @@ import { RegulatoryMappingModule } from './modules/regulatory-mapping/regulatory
 import { JurisdictionComparisonModule } from './modules/jurisdiction-comparison/jurisdiction-comparison.module';
 import { TraceabilityModule } from './modules/traceability/traceability.module';
 import { ChangeDetectionModule } from './modules/change-detection/change-detection.module';
+import { ConsultationAnalyticsModule } from './modules/consultation-analytics/consultation-analytics.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { ChangeDetectionModule } from './modules/change-detection/change-detecti
     JurisdictionComparisonModule,
     TraceabilityModule,
     ChangeDetectionModule,
+    ConsultationAnalyticsModule,
   ],
   controllers: [AppController],
   providers: [
