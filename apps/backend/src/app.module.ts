@@ -24,6 +24,7 @@ import { JurisdictionComparisonModule } from './modules/jurisdiction-comparison/
 import { TraceabilityModule } from './modules/traceability/traceability.module';
 import { ChangeDetectionModule } from './modules/change-detection/change-detection.module';
 import { ConsultationAnalyticsModule } from './modules/consultation-analytics/consultation-analytics.module';
+import { KnowledgeGraphModule } from './modules/knowledge-graph/knowledge-graph.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { ConsultationAnalyticsModule } from './modules/consultation-analytics/co
     TraceabilityModule,
     ChangeDetectionModule,
     ConsultationAnalyticsModule,
+    KnowledgeGraphModule,
   ],
   controllers: [AppController],
   providers: [
