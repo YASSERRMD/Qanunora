@@ -19,6 +19,7 @@ import { StakeholdersModule } from './modules/stakeholders/stakeholders.module';
 import { AiProvidersModule } from './modules/ai-providers/ai-providers.module';
 import { AiSummarizationModule } from './modules/ai-summarization/ai-summarization.module';
 import { AiImpactModule } from './modules/ai-impact/ai-impact.module';
+import { RegulatoryMappingModule } from './modules/regulatory-mapping/regulatory-mapping.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AiImpactModule } from './modules/ai-impact/ai-impact.module';
     AiProvidersModule,
     AiSummarizationModule,
     AiImpactModule,
+    RegulatoryMappingModule,
   ],
   controllers: [AppController],
   providers: [
