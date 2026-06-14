@@ -25,6 +25,7 @@ import { TraceabilityModule } from './modules/traceability/traceability.module';
 import { ChangeDetectionModule } from './modules/change-detection/change-detection.module';
 import { ConsultationAnalyticsModule } from './modules/consultation-analytics/consultation-analytics.module';
 import { KnowledgeGraphModule } from './modules/knowledge-graph/knowledge-graph.module';
+import { SemanticSearchModule } from './modules/semantic-search/semantic-search.module';
 
 @Module({
   imports: [
@@ -53,6 +54,7 @@ import { KnowledgeGraphModule } from './modules/knowledge-graph/knowledge-graph.
     ChangeDetectionModule,
     ConsultationAnalyticsModule,
     KnowledgeGraphModule,
+    SemanticSearchModule,
   ],
   controllers: [AppController],
   providers: [
