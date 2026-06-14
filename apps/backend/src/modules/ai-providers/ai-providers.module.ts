@@ -1,6 +1,7 @@
 import { Global, Module, OnModuleInit } from '@nestjs/common';
 import { AiProviderRegistry } from './ai-provider.registry';
 import { AiProviderFactory } from './ai-provider.factory';
+import { AiProvidersController } from './ai-providers.controller';
 import { OpenAiProvider } from './providers/openai.provider';
 import { AzureOpenAiProvider } from './providers/azure-openai.provider';
 import { AnthropicProvider } from './providers/anthropic.provider';
@@ -29,6 +30,7 @@ const PROVIDERS = [
 
 @Global()
 @Module({
+  controllers: [AiProvidersController],
   providers: [
     AiProviderRegistry,
     AiProviderFactory,
