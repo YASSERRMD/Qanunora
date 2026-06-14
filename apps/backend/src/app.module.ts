@@ -18,6 +18,7 @@ import { ConsultationsModule } from './modules/consultations/consultations.modul
 import { StakeholdersModule } from './modules/stakeholders/stakeholders.module';
 import { AiProvidersModule } from './modules/ai-providers/ai-providers.module';
 import { AiSummarizationModule } from './modules/ai-summarization/ai-summarization.module';
+import { AiImpactModule } from './modules/ai-impact/ai-impact.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { AiSummarizationModule } from './modules/ai-summarization/ai-summarizati
     StakeholdersModule,
     AiProvidersModule,
     AiSummarizationModule,
+    AiImpactModule,
   ],
   controllers: [AppController],
   providers: [
