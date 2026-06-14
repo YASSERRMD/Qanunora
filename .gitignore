@@ -41,5 +41,5 @@ coverage/
 .eslintcache
 .turbo
 
-# Prisma
-apps/backend/prisma/migrations/
+# Prisma: migrations are tracked in version control
+# apps/backend/prisma/migrations/
