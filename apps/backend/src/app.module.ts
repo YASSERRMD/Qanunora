@@ -13,6 +13,7 @@ import { VersionsModule } from './modules/versions/versions.module';
 import { WorkflowModule } from './modules/workflow/workflow.module';
 import { CommitteesModule } from './modules/committees/committees.module';
 import { AmendmentsModule } from './modules/amendments/amendments.module';
+import { LegalStructureModule } from './modules/legal-structure/legal-structure.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AmendmentsModule } from './modules/amendments/amendments.module';
     WorkflowModule,
     CommitteesModule,
     AmendmentsModule,
+    LegalStructureModule,
   ],
   controllers: [AppController],
   providers: [
