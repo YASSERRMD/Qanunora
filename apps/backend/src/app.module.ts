@@ -9,6 +9,7 @@ import { JwtAuthGuard } from './common/guards/jwt-auth.guard';
 import configuration from './config/configuration';
 import { LegislativeModule } from './modules/legislative/legislative.module';
 import { DocumentsModule } from './modules/documents/documents.module';
+import { VersionsModule } from './modules/versions/versions.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { DocumentsModule } from './modules/documents/documents.module';
     AuthModule,
     LegislativeModule,
     DocumentsModule,
+    VersionsModule,
   ],
   controllers: [AppController],
   providers: [
