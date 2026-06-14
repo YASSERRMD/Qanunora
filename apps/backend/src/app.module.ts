@@ -27,6 +27,7 @@ import { ConsultationAnalyticsModule } from './modules/consultation-analytics/co
 import { KnowledgeGraphModule } from './modules/knowledge-graph/knowledge-graph.module';
 import { SemanticSearchModule } from './modules/semantic-search/semantic-search.module';
 import { RagAssistantModule } from './modules/rag-assistant/rag-assistant.module';
+import { AuditReadinessModule } from './modules/audit-readiness/audit-readiness.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { RagAssistantModule } from './modules/rag-assistant/rag-assistant.module
     KnowledgeGraphModule,
     SemanticSearchModule,
     RagAssistantModule,
+    AuditReadinessModule,
   ],
   controllers: [AppController],
   providers: [
