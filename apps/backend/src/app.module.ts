@@ -20,6 +20,7 @@ import { AiProvidersModule } from './modules/ai-providers/ai-providers.module';
 import { AiSummarizationModule } from './modules/ai-summarization/ai-summarization.module';
 import { AiImpactModule } from './modules/ai-impact/ai-impact.module';
 import { RegulatoryMappingModule } from './modules/regulatory-mapping/regulatory-mapping.module';
+import { JurisdictionComparisonModule } from './modules/jurisdiction-comparison/jurisdiction-comparison.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { RegulatoryMappingModule } from './modules/regulatory-mapping/regulatory
     AiSummarizationModule,
     AiImpactModule,
     RegulatoryMappingModule,
+    JurisdictionComparisonModule,
   ],
   controllers: [AppController],
   providers: [
