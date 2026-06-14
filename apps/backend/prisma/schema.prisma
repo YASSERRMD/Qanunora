@@ -1,0 +1,715 @@
+// Qanunora — Prisma Schema
+// Government Legislative Intelligence Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserRole {
+  SUPER_ADMIN
+  LEGISLATIVE_ADMIN
+  MINISTRY_LEGAL_OFFICER
+  DRAFTING_OFFICER
+  REVIEWER
+  COMMITTEE_MEMBER
+  STAKEHOLDER_MANAGER
+  PUBLIC_CONSULTATION_OFFICER
+  AUDITOR
+  VIEWER
+}
+
+enum LegislativeItemType {
+  DRAFT_LAW
+  BILL
+  AMENDMENT
+  REGULATION
+  CABINET_DECISION
+  CIRCULAR
+  POLICY_DRAFT
+}
+
+enum LegislativeStatus {
+  DRAFTING
+  INTERNAL_REVIEW
+  COMMITTEE_REVIEW
+  PUBLIC_CONSULTATION
+  LEGAL_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum ConfidentialityLevel {
+  PUBLIC
+  INTERNAL
+  RESTRICTED
+  CONFIDENTIAL
+  TOP_SECRET
+}
+
+enum Priority {
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum DocumentCategory {
+  DRAFT
+  FINAL
+  SUPPORTING
+  REFERENCE
+  IMPACT_ANALYSIS
+  COMMITTEE_REPORT
+  CONSULTATION_FEEDBACK
+  LEGAL_OPINION
+}
+
+enum AmendmentStatus {
+  PROPOSED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  INCORPORATED
+}
+
+enum StakeholderType {
+  GOVERNMENT_ENTITY
+  PRIVATE_SECTOR
+  NGO
+  ACADEMIC
+  PUBLIC_REPRESENTATIVE
+  INDIVIDUAL
+  INTERNATIONAL_ORGANIZATION
+}
+
+enum ConsultationStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  REVIEWING
+  COMPLETED
+}
+
+enum WorkflowAction {
+  SUBMIT_FOR_REVIEW
+  SEND_TO_COMMITTEE
+  OPEN_CONSULTATION
+  CLOSE_CONSULTATION
+  SEND_TO_LEGAL
+  APPROVE
+  REJECT
+  REQUEST_REVISION
+  PUBLISH
+  ARCHIVE
+  RETURN_TO_DRAFT
+}
+
+enum NotificationType {
+  WORKFLOW_TRANSITION
+  REVIEW_REMINDER
+  CONSULTATION_DEADLINE
+  DOCUMENT_UPLOADED
+  COMMENT_ADDED
+  ASSIGNMENT
+  ESCALATION
+  SYSTEM
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  VIEW
+  DOWNLOAD
+  LOGIN
+  LOGOUT
+  APPROVE
+  REJECT
+  PUBLISH
+  EXPORT
+  TRANSITION
+}
+
+enum LegalStructureType {
+  CHAPTER
+  SECTION
+  ARTICLE
+  CLAUSE
+}
+
+enum ImpactCategory {
+  SOCIAL
+  ECONOMIC
+  ADMINISTRATIVE
+  LEGAL
+  OPERATIONAL
+  ENVIRONMENTAL
+}
+
+enum ImpactSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  NEGLIGIBLE
+}
+
+// ============================================================
+// USERS & AUTH
+// ============================================================
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  firstName    String    @map("first_name")
+  lastName     String    @map("last_name")
+  role         UserRole  @default(VIEWER)
+  isActive     Boolean   @default(true) @map("is_active")
+  ministryId   String?   @map("ministry_id")
+  avatarUrl    String?   @map("avatar_url")
+  lastLoginAt  DateTime? @map("last_login_at")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  ministry              Ministry?              @relation(fields: [ministryId], references: [id])
+  refreshTokens         RefreshToken[]
+  createdItems          LegislativeItem[]      @relation("CreatedItems")
+  assignedItems         LegislativeItem[]      @relation("AssignedItems")
+  workflowActions       WorkflowHistory[]
+  auditLogs             AuditLog[]
+  notifications         Notification[]
+  committeeMembers      CommitteeMember[]
+  uploadedDocuments     Document[]
+  consultationReviews   ConsultationFeedbackReview[]
+  aiAnalysisRequests    AiAnalysis[]
+  chatSessions          ChatSession[]
+  createdAmendments     Amendment[]            @relation("AmendmentProposedBy")
+  approvedAmendments    Amendment[]            @relation("AmendmentApprovedBy")
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ============================================================
+// ORGANIZATION
+// ============================================================
+
+model Ministry {
+  id          String   @id @default(uuid())
+  name        String
+  nameAr      String?  @map("name_ar")
+  code        String   @unique
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  users            User[]
+  legislativeItems LegislativeItem[]
+
+  @@map("ministries")
+}
+
+// ============================================================
+// LEGISLATIVE ITEMS
+// ============================================================
+
+model LegislativeItem {
+  id                   String               @id @default(uuid())
+  referenceNumber      String               @unique @map("reference_number")
+  title                String
+  titleAr              String?              @map("title_ar")
+  type                 LegislativeItemType
+  status               LegislativeStatus    @default(DRAFTING)
+  confidentialityLevel ConfidentialityLevel @default(INTERNAL) @map("confidentiality_level")
+  priority             Priority             @default(MEDIUM)
+  ministryId           String               @map("ministry_id")
+  assignedToId         String?              @map("assigned_to_id")
+  createdById          String               @map("created_by_id")
+  description          String?
+  objective            String?
+  targetEnactmentDate  DateTime?            @map("target_enactment_date")
+  publishedAt          DateTime?            @map("published_at")
+  createdAt            DateTime             @default(now()) @map("created_at")
+  updatedAt            DateTime             @updatedAt @map("updated_at")
+
+  ministry         Ministry          @relation(fields: [ministryId], references: [id])
+  createdBy        User              @relation("CreatedItems", fields: [createdById], references: [id])
+  assignedTo       User?             @relation("AssignedItems", fields: [assignedToId], references: [id])
+  documents        Document[]
+  versions         Version[]
+  workflowHistory  WorkflowHistory[]
+  amendments       Amendment[]
+  legalStructure   LegalStructure[]
+  consultations    Consultation[]
+  aiAnalyses       AiAnalysis[]
+  regulatoryRefs   RegulatoryReference[]
+  traceLinks       TraceLink[]
+  chatSessions     ChatSession[]
+
+  @@index([status])
+  @@index([type])
+  @@index([ministryId])
+  @@index([createdById])
+  @@map("legislative_items")
+}
+
+// ============================================================
+// DOCUMENTS
+// ============================================================
+
+model Document {
+  id                String           @id @default(uuid())
+  legislativeItemId String           @map("legislative_item_id")
+  uploadedById      String           @map("uploaded_by_id")
+  originalName      String           @map("original_name")
+  storagePath       String           @map("storage_path")
+  mimeType          String           @map("mime_type")
+  sizeBytes         BigInt           @map("size_bytes")
+  category          DocumentCategory @default(DRAFT)
+  title             String?
+  description       String?
+  isCurrentVersion  Boolean          @default(true) @map("is_current_version")
+  checksum          String?
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+
+  legislativeItem LegislativeItem  @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+  uploadedBy      User             @relation(fields: [uploadedById], references: [id])
+  versions        Version[]
+
+  @@index([legislativeItemId])
+  @@index([uploadedById])
+  @@map("documents")
+}
+
+// ============================================================
+// VERSIONS
+// ============================================================
+
+model Version {
+  id                String   @id @default(uuid())
+  legislativeItemId String   @map("legislative_item_id")
+  documentId        String?  @map("document_id")
+  versionNumber     Int      @map("version_number")
+  label             String?
+  notes             String?
+  contentSnapshot   Json?    @map("content_snapshot")
+  createdById       String   @map("created_by_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  legislativeItem LegislativeItem @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+  document        Document?       @relation(fields: [documentId], references: [id])
+
+  @@unique([legislativeItemId, versionNumber])
+  @@index([legislativeItemId])
+  @@map("versions")
+}
+
+// ============================================================
+// WORKFLOW
+// ============================================================
+
+model WorkflowHistory {
+  id                String         @id @default(uuid())
+  legislativeItemId String         @map("legislative_item_id")
+  fromStatus        LegislativeStatus? @map("from_status")
+  toStatus          LegislativeStatus  @map("to_status")
+  action            WorkflowAction
+  performedById     String         @map("performed_by_id")
+  comment           String?
+  metadata          Json?
+  createdAt         DateTime       @default(now()) @map("created_at")
+
+  legislativeItem LegislativeItem @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+  performedBy     User            @relation(fields: [performedById], references: [id])
+
+  @@index([legislativeItemId])
+  @@map("workflow_history")
+}
+
+// ============================================================
+// COMMITTEES
+// ============================================================
+
+model Committee {
+  id          String   @id @default(uuid())
+  name        String
+  nameAr      String?  @map("name_ar")
+  description String?
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  members     CommitteeMember[]
+  reviews     CommitteeReview[]
+
+  @@map("committees")
+}
+
+model CommitteeMember {
+  id          String    @id @default(uuid())
+  committeeId String    @map("committee_id")
+  userId      String    @map("user_id")
+  role        String    @default("MEMBER")
+  joinedAt    DateTime  @default(now()) @map("joined_at")
+  leftAt      DateTime? @map("left_at")
+
+  committee Committee @relation(fields: [committeeId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([committeeId, userId])
+  @@map("committee_members")
+}
+
+model CommitteeReview {
+  id                String   @id @default(uuid())
+  committeeId       String   @map("committee_id")
+  legislativeItemId String   @map("legislative_item_id")
+  recommendation    String?
+  notes             String?
+  reviewedAt        DateTime? @map("reviewed_at")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  committee       Committee       @relation(fields: [committeeId], references: [id])
+
+  @@index([committeeId])
+  @@index([legislativeItemId])
+  @@map("committee_reviews")
+}
+
+// ============================================================
+// AMENDMENTS
+// ============================================================
+
+model Amendment {
+  id                String          @id @default(uuid())
+  legislativeItemId String          @map("legislative_item_id")
+  proposedById      String          @map("proposed_by_id")
+  title             String
+  description       String
+  reason            String
+  articleReference  String?         @map("article_reference")
+  sectionReference  String?         @map("section_reference")
+  status            AmendmentStatus @default(PROPOSED)
+  impactSummary     String?         @map("impact_summary")
+  approvedById      String?         @map("approved_by_id")
+  approvedAt        DateTime?       @map("approved_at")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+
+  legislativeItem LegislativeItem @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+  proposedBy      User            @relation("AmendmentProposedBy", fields: [proposedById], references: [id])
+  approvedBy      User?           @relation("AmendmentApprovedBy", fields: [approvedById], references: [id])
+
+  @@index([legislativeItemId])
+  @@index([status])
+  @@map("amendments")
+}
+
+// ============================================================
+// LEGAL STRUCTURE (Articles, Sections, Chapters, Clauses)
+// ============================================================
+
+model LegalStructure {
+  id                String             @id @default(uuid())
+  legislativeItemId String             @map("legislative_item_id")
+  type              LegalStructureType
+  number            String
+  title             String?
+  content           String?
+  order             Int
+  parentId          String?            @map("parent_id")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  legislativeItem LegislativeItem  @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+  parent          LegalStructure?  @relation("StructureHierarchy", fields: [parentId], references: [id])
+  children        LegalStructure[] @relation("StructureHierarchy")
+
+  @@index([legislativeItemId])
+  @@index([parentId])
+  @@map("legal_structures")
+}
+
+// ============================================================
+// STAKEHOLDERS
+// ============================================================
+
+model Stakeholder {
+  id              String          @id @default(uuid())
+  name            String
+  nameAr          String?         @map("name_ar")
+  type            StakeholderType
+  contactEmail    String?         @map("contact_email")
+  contactPhone    String?         @map("contact_phone")
+  address         String?
+  website         String?
+  description     String?
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  communicationLogs StakeholderCommunicationLog[]
+  consultationFeedback ConsultationFeedback[]
+
+  @@map("stakeholders")
+}
+
+model StakeholderCommunicationLog {
+  id            String      @id @default(uuid())
+  stakeholderId String      @map("stakeholder_id")
+  subject       String
+  content       String
+  channel       String      @default("EMAIL")
+  direction     String      @default("OUTBOUND")
+  sentAt        DateTime?   @map("sent_at")
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  stakeholder Stakeholder @relation(fields: [stakeholderId], references: [id], onDelete: Cascade)
+
+  @@map("stakeholder_communication_logs")
+}
+
+// ============================================================
+// CONSULTATIONS
+// ============================================================
+
+model Consultation {
+  id                String             @id @default(uuid())
+  legislativeItemId String             @map("legislative_item_id")
+  title             String
+  description       String?
+  status            ConsultationStatus @default(DRAFT)
+  openDate          DateTime?          @map("open_date")
+  closeDate         DateTime?          @map("close_date")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  legislativeItem LegislativeItem    @relation(fields: [legislativeItemId], references: [id])
+  feedback        ConsultationFeedback[]
+
+  @@index([legislativeItemId])
+  @@index([status])
+  @@map("consultations")
+}
+
+model ConsultationFeedback {
+  id             String    @id @default(uuid())
+  consultationId String    @map("consultation_id")
+  stakeholderId  String?   @map("stakeholder_id")
+  submitterName  String?   @map("submitter_name")
+  submitterEmail String?   @map("submitter_email")
+  content        String
+  category       String?
+  sentiment      String?
+  isPublic       Boolean   @default(false) @map("is_public")
+  submittedAt    DateTime  @default(now()) @map("submitted_at")
+
+  consultation Consultation @relation(fields: [consultationId], references: [id], onDelete: Cascade)
+  stakeholder  Stakeholder? @relation(fields: [stakeholderId], references: [id])
+  reviews      ConsultationFeedbackReview[]
+
+  @@index([consultationId])
+  @@map("consultation_feedback")
+}
+
+model ConsultationFeedbackReview {
+  id         String   @id @default(uuid())
+  feedbackId String   @map("feedback_id")
+  reviewedBy String   @map("reviewed_by")
+  notes      String?
+  decision   String?
+  reviewedAt DateTime @default(now()) @map("reviewed_at")
+
+  feedback ConsultationFeedback @relation(fields: [feedbackId], references: [id], onDelete: Cascade)
+  reviewer User                 @relation(fields: [reviewedBy], references: [id])
+
+  @@map("consultation_feedback_reviews")
+}
+
+// ============================================================
+// AI ANALYSIS
+// ============================================================
+
+model AiAnalysis {
+  id                String   @id @default(uuid())
+  legislativeItemId String   @map("legislative_item_id")
+  requestedById     String   @map("requested_by_id")
+  analysisType      String   @map("analysis_type")
+  provider          String
+  model             String
+  prompt            String?
+  result            Json
+  confidenceScore   Float?   @map("confidence_score")
+  processingTimeMs  Int?     @map("processing_time_ms")
+  isAiGenerated     Boolean  @default(true) @map("is_ai_generated")
+  reviewedByHuman   Boolean  @default(false) @map("reviewed_by_human")
+  disclaimer        String   @default("AI-assisted analysis, not legal advice") @map("disclaimer")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  legislativeItem LegislativeItem @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+  requestedBy     User            @relation(fields: [requestedById], references: [id])
+
+  @@index([legislativeItemId])
+  @@index([analysisType])
+  @@map("ai_analyses")
+}
+
+// ============================================================
+// REGULATORY REFERENCES & TRACEABILITY
+// ============================================================
+
+model RegulatoryReference {
+  id                String   @id @default(uuid())
+  legislativeItemId String   @map("legislative_item_id")
+  referenceType     String   @map("reference_type")
+  referenceName     String   @map("reference_name")
+  referenceNumber   String?  @map("reference_number")
+  jurisdiction      String?
+  description       String?
+  isConflicting     Boolean  @default(false) @map("is_conflicting")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  legislativeItem LegislativeItem @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+
+  @@index([legislativeItemId])
+  @@map("regulatory_references")
+}
+
+model TraceLink {
+  id                String   @id @default(uuid())
+  legislativeItemId String   @map("legislative_item_id")
+  sourceType        String   @map("source_type")
+  sourceId          String   @map("source_id")
+  targetType        String   @map("target_type")
+  targetId          String   @map("target_id")
+  linkType          String   @map("link_type")
+  description       String?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  legislativeItem LegislativeItem @relation(fields: [legislativeItemId], references: [id], onDelete: Cascade)
+
+  @@index([legislativeItemId])
+  @@index([sourceType, sourceId])
+  @@map("trace_links")
+}
+
+// ============================================================
+// CHAT / AI ASSISTANT
+// ============================================================
+
+model ChatSession {
+  id                String    @id @default(uuid())
+  userId            String    @map("user_id")
+  legislativeItemId String?   @map("legislative_item_id")
+  title             String?
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  user            User             @relation(fields: [userId], references: [id])
+  legislativeItem LegislativeItem? @relation(fields: [legislativeItemId], references: [id])
+  messages        ChatMessage[]
+
+  @@index([userId])
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  sessionId String   @map("session_id")
+  role      String
+  content   String
+  sources   Json?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId])
+  @@map("chat_messages")
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+
+model Notification {
+  id         String           @id @default(uuid())
+  userId     String           @map("user_id")
+  type       NotificationType
+  title      String
+  body       String
+  isRead     Boolean          @default(false) @map("is_read")
+  entityType String?          @map("entity_type")
+  entityId   String?          @map("entity_id")
+  metadata   Json?
+  createdAt  DateTime         @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+// ============================================================
+// AUDIT LOG
+// ============================================================
+
+model AuditLog {
+  id          String      @id @default(uuid())
+  userId      String?     @map("user_id")
+  action      AuditAction
+  entityType  String      @map("entity_type")
+  entityId    String?     @map("entity_id")
+  ipAddress   String?     @map("ip_address")
+  userAgent   String?     @map("user_agent")
+  oldValues   Json?       @map("old_values")
+  newValues   Json?       @map("new_values")
+  metadata    Json?
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([entityType, entityId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================
+// SYSTEM SETTINGS
+// ============================================================
+
+model SystemSetting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       Json
+  description String?
+  isPublic    Boolean  @default(false) @map("is_public")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+}
