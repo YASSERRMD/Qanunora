@@ -30,6 +30,7 @@ import { RagAssistantModule } from './modules/rag-assistant/rag-assistant.module
 import { AuditReadinessModule } from './modules/audit-readiness/audit-readiness.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
     AuditReadinessModule,
     NotificationsModule,
     ReportingModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [
