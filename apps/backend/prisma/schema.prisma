@@ -1529,3 +1529,41 @@ model AnonFeedback {
   @@index([moderationStatus])
   @@map("anon_feedback")
 }
+
+// ============================================================
+// ADVANCED AUDIT LOGGING
+// ============================================================
+
+model ImmutableAuditEntry {
+  id             String    @id @default(uuid())
+  sequenceNumber Int       @unique
+  eventType      String
+  actorId        String?
+  actorEmail     String?
+  entityType     String
+  entityId       String
+  action         String
+  payload        Json
+  ipAddress      String?
+  userAgent      String?
+  previousHash   String?
+  entryHash      String
+  retainUntil    DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([entityType, entityId])
+  @@index([actorId])
+  @@index([createdAt])
+  @@map("immutable_audit_entries")
+}
+
+model AuditRetentionPolicy {
+  id            String   @id @default(uuid())
+  entityType    String   @unique
+  retentionDays Int
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("audit_retention_policies")
+}
