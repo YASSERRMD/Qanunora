@@ -1905,3 +1905,45 @@ model InboundWebhook {
 
   @@map("inbound_webhooks")
 }
+
+// ============================================================
+// GOVERNMENT REGISTRY INTEGRATIONS
+// ============================================================
+
+enum RegistryType {
+  ENTITY_REGISTRY
+  MINISTRY_REGISTRY
+  GAZETTE_REGISTRY
+  LEGAL_REFERENCE_REGISTRY
+  PERSONNEL_REGISTRY
+}
+
+model RegistryAdapter {
+  id           String          @id @default(uuid())
+  name         String          @unique
+  registryType RegistryType
+  baseUrl      String?
+  isEnabled    Boolean         @default(false)
+  config       Json            @default("{}")
+  lastSyncAt   DateTime?
+  syncLogs     RegistrySyncLog[]
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@map("registry_adapters")
+}
+
+model RegistrySyncLog {
+  id          String          @id @default(uuid())
+  adapterId   String
+  adapter     RegistryAdapter @relation(fields: [adapterId], references: [id])
+  syncType    String
+  recordsIn   Int             @default(0)
+  recordsOut  Int             @default(0)
+  errors      Json            @default("[]")
+  success     Boolean         @default(false)
+  startedAt   DateTime        @default(now())
+  completedAt DateTime?
+
+  @@map("registry_sync_logs")
+}
