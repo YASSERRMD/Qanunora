@@ -8,6 +8,14 @@ export const metadata: Metadata = {
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
+      {/* Skip to content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:px-4 focus:py-2 focus:bg-[#C9A84C] focus:text-white focus:text-sm focus:font-medium"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="bg-[#1B2A4A] shadow-md" role="banner">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
