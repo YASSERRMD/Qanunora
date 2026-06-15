@@ -32,6 +32,7 @@ import { AuditReadinessModule } from './modules/audit-readiness/audit-readiness.
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { ReportingModule } from './modules/reporting/reporting.module';
 import { AdminModule } from './modules/admin/admin.module';
+import { TenancyModule } from './modules/tenancy/tenancy.module';
 
 @Module({
   imports: [
@@ -71,6 +72,7 @@ import { AdminModule } from './modules/admin/admin.module';
     NotificationsModule,
     ReportingModule,
     AdminModule,
+    TenancyModule,
   ],
   controllers: [AppController],
   providers: [
