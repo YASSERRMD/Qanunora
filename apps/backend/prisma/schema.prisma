@@ -1873,3 +1873,35 @@ model WebhookSubscription {
 
   @@map("webhook_subscriptions")
 }
+
+model IntegrationLog {
+  id              String               @id @default(uuid())
+  integrationId   String?
+  integration     ExternalIntegration? @relation(fields: [integrationId], references: [id])
+  eventType       String
+  direction       LogDirection         @default(OUTBOUND)
+  payload         Json
+  responseStatus  Int?
+  responseBody    Json?
+  success         Boolean              @default(false)
+  errorMessage    String?
+  retryCount      Int                  @default(0)
+  targetUrl       String?
+  createdAt       DateTime             @default(now())
+
+  @@map("integration_logs")
+}
+
+model InboundWebhook {
+  id           String    @id @default(uuid())
+  source       String
+  eventType    String
+  payload      Json
+  headers      Json      @default("{}")
+  processed    Boolean   @default(false)
+  processedAt  DateTime?
+  errorMessage String?
+  createdAt    DateTime  @default(now())
+
+  @@map("inbound_webhooks")
+}
