@@ -129,14 +129,12 @@ export class CollaborationService {
       where: { legislativeItemId },
       orderBy: { savedAt: 'desc' },
       take: MAX_AUTOSAVES,
-      include: { savedBy: { select: { id: true, firstName: true, lastName: true } } },
       select: {
         id: true,
         legislativeItemId: true,
         savedById: true,
         savedAt: true,
-        savedBy: true,
-        content: false,
+        savedBy: { select: { id: true, firstName: true, lastName: true } },
       },
     });
   }

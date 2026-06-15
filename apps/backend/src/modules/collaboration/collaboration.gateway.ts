@@ -34,7 +34,7 @@ interface ContentChangePayload {
 export class CollaborationGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  @WebSocketServer() server: Server;
+  @WebSocketServer() server!: Server;
 
   private readonly logger = new Logger(CollaborationGateway.name);
 
