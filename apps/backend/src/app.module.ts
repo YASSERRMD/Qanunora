@@ -57,6 +57,7 @@ import { ClassificationModule } from './modules/classification/classification.mo
 import { SecurityControlsModule } from './modules/security-controls/security-controls.module';
 import { SsoModule } from './modules/sso/sso.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
+import { RegistryAdaptersModule } from './modules/registry-adapters/registry-adapters.module';
 
 @Module({
   imports: [
@@ -121,6 +122,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
     SecurityControlsModule,
     SsoModule,
     IntegrationsModule,
+    RegistryAdaptersModule,
   ],
   controllers: [AppController],
   providers: [
