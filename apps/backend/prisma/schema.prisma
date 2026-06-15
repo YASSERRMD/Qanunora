@@ -252,6 +252,7 @@ model User {
   moderatedFeedback      AnonFeedback[]
   reviewedTranslations   TranslationRequest[]  @relation("TranslationReviewer")
   createdTranslations    TranslationRequest[]  @relation("TranslationCreator")
+  glossaryTerms          GlossaryTerm[]
 
   @@map("users")
 }
@@ -1210,6 +1211,41 @@ model Resolution {
   createdAt     DateTime   @default(now()) @map("created_at")
 
   @@map("resolutions")
+}
+
+// ============================================================
+// LEGAL GLOSSARY
+// ============================================================
+
+enum TermStatus {
+  ACTIVE
+  DEPRECATED
+  PROPOSED
+  REJECTED
+}
+
+model GlossaryTerm {
+  id              String     @id @default(uuid())
+  termEn          String     @map("term_en")
+  termAr          String?    @map("term_ar")
+  definition      String
+  definitionAr    String?    @map("definition_ar")
+  domain          String     @default("general")
+  category        String?
+  status          TermStatus @default(ACTIVE)
+  isPreferred     Boolean    @default(true) @map("is_preferred")
+  relatedTermIds  String[]   @default([]) @map("related_term_ids")
+  deprecatedTerms String[]   @default([]) @map("deprecated_terms")
+  source          String?
+  createdById     String     @map("created_by_id")
+  createdBy       User       @relation(fields: [createdById], references: [id])
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+
+  @@unique([termEn, domain])
+  @@index([status])
+  @@index([domain])
+  @@map("glossary_terms")
 }
 
 // ============================================================
