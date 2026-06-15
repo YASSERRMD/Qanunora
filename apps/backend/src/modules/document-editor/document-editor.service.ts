@@ -43,20 +43,16 @@ export class DocumentEditorService {
     return this.prisma.documentEdit.findMany({
       where: { legislativeItemId },
       orderBy: { createdAt: 'desc' },
-      include: {
-        editor: { select: { id: true, firstName: true, lastName: true } },
-      },
       select: {
         id: true,
+        legislativeItemId: true,
+        editorId: true,
         editType: true,
         changeDescription: true,
         wordCount: true,
         characterCount: true,
         createdAt: true,
-        editor: true,
-        legislativeItemId: true,
-        editorId: true,
-        contentSnapshot: false,
+        editor: { select: { id: true, firstName: true, lastName: true } },
       },
     });
   }
