@@ -272,6 +272,7 @@ model User {
   userSessions           UserSession[]           @relation("UserSessions")
   loginHistory           LoginHistory[]          @relation("LoginHistory")
   ipRestrictions         IpRestriction[]         @relation("IpRestrictionCreator")
+  idpUserMappings        IdpUserMapping[]        @relation("IdpUserMappings")
 
   @@map("users")
 }
@@ -1539,6 +1540,58 @@ model AnonFeedback {
   @@index([consultationId])
   @@index([moderationStatus])
   @@map("anon_feedback")
+}
+
+// ============================================================
+// SSO INTEGRATION
+// ============================================================
+
+enum IdpType {
+  OIDC
+  SAML
+  LDAP
+}
+
+model IdentityProvider {
+  id            String           @id @default(uuid())
+  name          String           @unique
+  type          IdpType
+  isActive      Boolean          @default(true)
+  config        Json
+  createdById   String
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  userMappings  IdpUserMapping[]
+  groupMappings IdpGroupMapping[]
+
+  @@map("identity_providers")
+}
+
+model IdpUserMapping {
+  id             String           @id @default(uuid())
+  providerId     String
+  provider       IdentityProvider @relation(fields: [providerId], references: [id])
+  userId         String
+  user           User             @relation("IdpUserMappings", fields: [userId], references: [id])
+  externalId     String
+  externalEmail  String?
+  lastLoginAt    DateTime?
+  createdAt      DateTime         @default(now())
+
+  @@unique([providerId, externalId])
+  @@map("idp_user_mappings")
+}
+
+model IdpGroupMapping {
+  id          String           @id @default(uuid())
+  providerId  String
+  provider    IdentityProvider @relation(fields: [providerId], references: [id])
+  groupName   String
+  role        String
+  createdAt   DateTime         @default(now())
+
+  @@unique([providerId, groupName])
+  @@map("idp_group_mappings")
 }
 
 // ============================================================
