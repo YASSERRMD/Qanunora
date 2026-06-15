@@ -36,6 +36,7 @@ import { TenancyModule } from './modules/tenancy/tenancy.module';
 import { OrganizationModule } from './modules/organization/organization.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
+import { MeetingsModule } from './modules/meetings/meetings.module';
 
 @Module({
   imports: [
@@ -79,6 +80,7 @@ import { CalendarModule } from './modules/calendar/calendar.module';
     OrganizationModule,
     DashboardModule,
     CalendarModule,
+    MeetingsModule,
   ],
   controllers: [AppController],
   providers: [
