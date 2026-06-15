@@ -42,6 +42,7 @@ import { LegalOpinionsModule } from './modules/legal-opinions/legal-opinions.mod
 import { CabinetSubmissionsModule } from './modules/cabinet-submissions/cabinet-submissions.module';
 import { ParliamentarySessionsModule } from './modules/parliamentary-sessions/parliamentary-sessions.module';
 import { VotingModule } from './modules/voting/voting.module';
+import { PublicPortalModule } from './modules/public-portal/public-portal.module';
 
 @Module({
   imports: [
@@ -91,6 +92,7 @@ import { VotingModule } from './modules/voting/voting.module';
     CabinetSubmissionsModule,
     ParliamentarySessionsModule,
     VotingModule,
+    PublicPortalModule,
   ],
   controllers: [AppController],
   providers: [
