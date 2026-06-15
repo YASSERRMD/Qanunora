@@ -240,6 +240,8 @@ model User {
   createdCalendarEvents  CalendarEvent[]       @relation("EventCreator")
   createdMeetings        Meeting[]             @relation("MeetingCreator")
   meetingAttendances     MeetingAttendee[]     @relation("MeetingAttendees")
+  ownedDecisions         DecisionRecord[]      @relation("DecisionOwner")
+  createdDecisions       DecisionRecord[]      @relation("DecisionCreator")
 
   @@map("users")
 }
@@ -917,4 +919,45 @@ model MeetingAttendee {
 
   @@unique([meetingId, userId])
   @@map("meeting_attendees")
+}
+
+// ============================================================
+// DECISION REGISTER
+// ============================================================
+
+enum DecisionStatus {
+  ACTIVE
+  SUPERSEDED
+  REVOKED
+}
+
+model DecisionRecord {
+  id              String         @id @default(uuid())
+  referenceNumber String         @unique @map("reference_number")
+  title           String
+  description     String
+  rationale       String?
+  decisionDate    DateTime       @map("decision_date")
+  ownerId         String         @map("owner_id")
+  owner           User           @relation("DecisionOwner", fields: [ownerId], references: [id])
+  status          DecisionStatus @default(ACTIVE)
+  linkedItems     DecisionLink[]
+  createdById     String         @map("created_by_id")
+  createdBy       User           @relation("DecisionCreator", fields: [createdById], references: [id])
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  @@map("decision_records")
+}
+
+model DecisionLink {
+  id         String         @id @default(uuid())
+  decisionId String         @map("decision_id")
+  decision   DecisionRecord @relation(fields: [decisionId], references: [id], onDelete: Cascade)
+  entityType String         @map("entity_type")
+  entityId   String         @map("entity_id")
+  linkNote   String?        @map("link_note")
+  createdAt  DateTime       @default(now()) @map("created_at")
+
+  @@map("decision_links")
 }
