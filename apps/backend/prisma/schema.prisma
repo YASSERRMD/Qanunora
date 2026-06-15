@@ -249,6 +249,7 @@ model User {
   createdSessions        ParliamentarySession[] @relation("SessionCreator")
   createdVoteEvents      VoteEvent[]           @relation("VoteCreator")
   memberVotePositions    MemberVotePosition[]  @relation("VoteMember")
+  moderatedFeedback      AnonFeedback[]
 
   @@map("users")
 }
@@ -606,6 +607,7 @@ model Consultation {
 
   legislativeItem LegislativeItem    @relation(fields: [legislativeItemId], references: [id])
   feedback        ConsultationFeedback[]
+  anonFeedback    AnonFeedback[]
 
   @@index([legislativeItemId])
   @@index([status])
@@ -1204,4 +1206,40 @@ model Resolution {
   createdAt     DateTime   @default(now()) @map("created_at")
 
   @@map("resolutions")
+}
+
+// ============================================================
+// ANONYMOUS FEEDBACK & MODERATION
+// ============================================================
+
+enum ModerationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  FLAGGED
+}
+
+model AnonFeedback {
+  id               String           @id @default(uuid())
+  consultationId   String           @map("consultation_id")
+  consultation     Consultation     @relation(fields: [consultationId], references: [id])
+  submitterName    String?          @map("submitter_name")
+  submitterEmail   String?          @map("submitter_email")
+  content          String
+  category         String?
+  isSpam           Boolean          @default(false) @map("is_spam")
+  isOffensive      Boolean          @default(false) @map("is_offensive")
+  moderationStatus ModerationStatus @default(PENDING) @map("moderation_status")
+  moderatedById    String?          @map("moderated_by_id")
+  moderatedBy      User?            @relation(fields: [moderatedById], references: [id])
+  moderatedAt      DateTime?        @map("moderated_at")
+  moderatorNote    String?          @map("moderator_note")
+  aiSpamScore      Float?           @map("ai_spam_score")
+  aiOffensiveScore Float?           @map("ai_offensive_score")
+  publishedAt      DateTime?        @map("published_at")
+  createdAt        DateTime         @default(now()) @map("created_at")
+
+  @@index([consultationId])
+  @@index([moderationStatus])
+  @@map("anon_feedback")
 }
