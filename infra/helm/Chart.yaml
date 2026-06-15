@@ -1,0 +1,16 @@
+apiVersion: v2
+name: qanunora
+description: Qanunora Government Legislative Intelligence Platform
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - government
+  - legislative
+  - legal
+  - platform
+home: https://github.com/YASSERRMD/Qanunora
+maintainers:
+  - name: YASSERRMD
+    email: arafath.yasser@gmail.com
+dependencies: []

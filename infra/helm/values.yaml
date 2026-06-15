@@ -1,0 +1,96 @@
+global:
+  namespace: qanunora
+  imageRegistry: ghcr.io/yasserrmd
+  imagePullPolicy: IfNotPresent
+
+backend:
+  image:
+    repository: qanunora-backend
+    tag: latest
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  service:
+    type: ClusterIP
+    port: 3001
+  healthcheck:
+    path: /api/health
+    readinessPath: /api/readiness
+
+frontend:
+  image:
+    repository: qanunora-frontend
+    tag: latest
+  replicaCount: 2
+  resources:
+    requests:
+      memory: "128Mi"
+      cpu: "125m"
+    limits:
+      memory: "256Mi"
+      cpu: "250m"
+  service:
+    type: ClusterIP
+    port: 3000
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    frontend: qanunora.gov
+    backend: api.qanunora.gov
+  tls:
+    enabled: true
+    secretName: qanunora-tls
+
+postgres:
+  enabled: true  # Set to false when using managed DB (recommended for production)
+  image:
+    repository: postgres
+    tag: "15-alpine"
+  storage:
+    size: 20Gi
+    storageClass: ""
+
+redis:
+  enabled: true
+  image:
+    repository: redis
+    tag: "7-alpine"
+  resources:
+    requests:
+      memory: "64Mi"
+      cpu: "50m"
+    limits:
+      memory: "256Mi"
+      cpu: "200m"
+
+config:
+  logLevel: info
+  nodeEnv: production
+  corsOrigins: "https://qanunora.gov"
+
+secrets:
+  # Values should be provided via --set or external secrets manager
+  # Never commit real values here
+  databaseUrl: ""
+  jwtSecret: ""
+  jwtRefreshSecret: ""
+  encryptionSecret: ""
+  redisUrl: ""
+  openaiApiKey: ""
+  anthropicApiKey: ""
