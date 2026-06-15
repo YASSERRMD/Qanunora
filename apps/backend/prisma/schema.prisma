@@ -247,8 +247,42 @@ model Ministry {
   tenant           Tenant?           @relation(fields: [tenantId], references: [id])
   users            User[]
   legislativeItems LegislativeItem[]
+  departments      Department[]
 
   @@map("ministries")
+}
+
+model Department {
+  id          String   @id @default(uuid())
+  name        String
+  code        String   @unique
+  description String?
+  ministryId  String   @map("ministry_id")
+  ministry    Ministry @relation(fields: [ministryId], references: [id])
+  parentId    String?  @map("parent_id")
+  parent      Department?  @relation("DeptHierarchy", fields: [parentId], references: [id])
+  children    Department[] @relation("DeptHierarchy")
+  units       Unit[]
+  headUserId  String?  @map("head_user_id")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("departments")
+}
+
+model Unit {
+  id           String     @id @default(uuid())
+  name         String
+  code         String     @unique
+  departmentId String     @map("department_id")
+  department   Department @relation(fields: [departmentId], references: [id])
+  headUserId   String?    @map("head_user_id")
+  isActive     Boolean    @default(true) @map("is_active")
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+
+  @@map("units")
 }
 
 // ============================================================

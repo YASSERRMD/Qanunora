@@ -33,6 +33,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ReportingModule } from './modules/reporting/reporting.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { TenancyModule } from './modules/tenancy/tenancy.module';
+import { OrganizationModule } from './modules/organization/organization.module';
 
 @Module({
   imports: [
@@ -73,6 +74,7 @@ import { TenancyModule } from './modules/tenancy/tenancy.module';
     ReportingModule,
     AdminModule,
     TenancyModule,
+    OrganizationModule,
   ],
   controllers: [AppController],
   providers: [
