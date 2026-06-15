@@ -1,14 +1,16 @@
 export class CreateRetentionRuleDto {
   name: string;
   entityType: string;
-  condition: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  condition: any;
   action: 'ARCHIVE' | 'DELETE' | 'EXPORT_AND_DELETE';
   retentionYears?: number;
 }
 
 export class UpdateRetentionRuleDto {
   name?: string;
-  condition?: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  condition?: any;
   action?: 'ARCHIVE' | 'DELETE' | 'EXPORT_AND_DELETE';
   retentionYears?: number;
   isActive?: boolean;
