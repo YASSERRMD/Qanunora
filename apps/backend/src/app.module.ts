@@ -37,6 +37,7 @@ import { OrganizationModule } from './modules/organization/organization.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { CalendarModule } from './modules/calendar/calendar.module';
 import { MeetingsModule } from './modules/meetings/meetings.module';
+import { DecisionRegisterModule } from './modules/decision-register/decision-register.module';
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { MeetingsModule } from './modules/meetings/meetings.module';
     DashboardModule,
     CalendarModule,
     MeetingsModule,
+    DecisionRegisterModule,
   ],
   controllers: [AppController],
   providers: [
