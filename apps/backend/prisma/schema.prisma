@@ -267,8 +267,11 @@ model User {
   archivedItems          ArchivedItem[]  @relation("ArchiveCreator")
   classifiedItems        ContentClassification[] @relation("Classifier")
   declassifiedItems      ContentClassification[] @relation("Declassifier")
-  accessExceptions       AccessException[] @relation
-  grantedExceptions      AccessException[] @relation("ExceptionGrantor")
+  accessExceptions       AccessException[]
+  grantedExceptions      AccessException[]       @relation("ExceptionGrantor")
+  userSessions           UserSession[]           @relation("UserSessions")
+  loginHistory           LoginHistory[]          @relation("LoginHistory")
+  ipRestrictions         IpRestriction[]         @relation("IpRestrictionCreator")
 
   @@map("users")
 }
@@ -1536,6 +1539,90 @@ model AnonFeedback {
   @@index([consultationId])
   @@index([moderationStatus])
   @@map("anon_feedback")
+}
+
+// ============================================================
+// ADVANCED SECURITY CONTROLS
+// ============================================================
+
+enum IpRuleType {
+  BLOCK
+  ALLOW
+}
+
+enum SuspiciousType {
+  BRUTE_FORCE
+  UNUSUAL_LOCATION
+  MASS_EXPORT
+  PRIVILEGE_ESCALATION
+  OFF_HOURS_ACCESS
+}
+
+model UserSession {
+  id             String    @id @default(uuid())
+  userId         String
+  user           User      @relation("UserSessions", fields: [userId], references: [id])
+  sessionToken   String    @unique
+  deviceInfo     Json      @default("{}")
+  ipAddress      String?
+  userAgent      String?
+  isActive       Boolean   @default(true)
+  lastActivityAt DateTime  @default(now())
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  revokedById    String?
+  createdAt      DateTime  @default(now())
+
+  @@index([userId])
+  @@map("user_sessions")
+}
+
+model LoginHistory {
+  id         String    @id @default(uuid())
+  userId     String?
+  user       User?     @relation("LoginHistory", fields: [userId], references: [id])
+  email      String
+  ipAddress  String?
+  userAgent  String?
+  success    Boolean
+  failReason String?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId])
+  @@index([email])
+  @@index([ipAddress])
+  @@map("login_history")
+}
+
+model IpRestriction {
+  id          String     @id @default(uuid())
+  ipAddress   String
+  type        IpRuleType @default(BLOCK)
+  reason      String?
+  isActive    Boolean    @default(true)
+  createdById String
+  createdBy   User       @relation("IpRestrictionCreator", fields: [createdById], references: [id])
+  expiresAt   DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@unique([ipAddress, type])
+  @@map("ip_restrictions")
+}
+
+model SuspiciousActivity {
+  id           String         @id @default(uuid())
+  userId       String?
+  email        String?
+  ipAddress    String?
+  activityType SuspiciousType
+  details      Json
+  riskScore    Float
+  isResolved   Boolean        @default(false)
+  resolvedById String?
+  resolvedAt   DateTime?
+  createdAt    DateTime       @default(now())
+
+  @@map("suspicious_activities")
 }
 
 // ============================================================
