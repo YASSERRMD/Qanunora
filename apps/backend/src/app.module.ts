@@ -58,6 +58,7 @@ import { SecurityControlsModule } from './modules/security-controls/security-con
 import { SsoModule } from './modules/sso/sso.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { RegistryAdaptersModule } from './modules/registry-adapters/registry-adapters.module';
+import { GazetteModule } from './modules/gazette/gazette.module';
 
 @Module({
   imports: [
@@ -123,6 +124,7 @@ import { RegistryAdaptersModule } from './modules/registry-adapters/registry-ada
     SsoModule,
     IntegrationsModule,
     RegistryAdaptersModule,
+    GazetteModule,
   ],
   controllers: [AppController],
   providers: [
