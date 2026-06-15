@@ -253,6 +253,8 @@ model User {
   reviewedTranslations   TranslationRequest[]  @relation("TranslationReviewer")
   createdTranslations    TranslationRequest[]  @relation("TranslationCreator")
   glossaryTerms          GlossaryTerm[]
+  documentEdits          DocumentEdit[]  @relation("DocumentEditorUser")
+  editorComments         EditorComment[] @relation("EditorCommentAuthor")
 
   @@map("users")
 }
@@ -368,6 +370,8 @@ model LegislativeItem {
   cabinetSubmissions  CabinetSubmission[]
   readingStages       ReadingStage[]
   voteEvents          VoteEvent[]
+  documentEdits       DocumentEdit[]
+  editorComments      EditorComment[]
 
   @@index([status])
   @@index([type])
@@ -1304,6 +1308,52 @@ model TranslationRequest {
   @@index([status])
   @@index([createdById])
   @@map("translation_requests")
+}
+
+// ============================================================
+// DOCUMENT EDITOR
+// ============================================================
+
+enum EditType {
+  CONTENT
+  FORMATTING
+  STRUCTURE
+  ANNOTATION
+}
+
+model DocumentEdit {
+  id                String    @id @default(uuid())
+  legislativeItemId String
+  legislativeItem   LegislativeItem @relation(fields: [legislativeItemId], references: [id])
+  editorId          String
+  editor            User      @relation("DocumentEditorUser", fields: [editorId], references: [id])
+  contentSnapshot   String
+  changeDescription String?
+  editType          EditType  @default(CONTENT)
+  wordCount         Int?
+  characterCount    Int?
+  createdAt         DateTime  @default(now())
+
+  @@index([legislativeItemId])
+  @@map("document_edits")
+}
+
+model EditorComment {
+  id                String    @id @default(uuid())
+  legislativeItemId String
+  legislativeItem   LegislativeItem @relation(fields: [legislativeItemId], references: [id])
+  authorId          String
+  author            User      @relation("EditorCommentAuthor", fields: [authorId], references: [id])
+  content           String
+  articleRef        String?
+  isResolved        Boolean   @default(false)
+  resolvedById      String?
+  resolvedAt        DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([legislativeItemId])
+  @@map("editor_comments")
 }
 
 // ============================================================

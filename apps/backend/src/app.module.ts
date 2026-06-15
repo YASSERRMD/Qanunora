@@ -46,6 +46,7 @@ import { PublicPortalModule } from './modules/public-portal/public-portal.module
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { AiTranslationModule } from './modules/ai-translation/ai-translation.module';
 import { GlossaryModule } from './modules/glossary/glossary.module';
+import { DocumentEditorModule } from './modules/document-editor/document-editor.module';
 
 @Module({
   imports: [
@@ -99,6 +100,7 @@ import { GlossaryModule } from './modules/glossary/glossary.module';
     ModerationModule,
     AiTranslationModule,
     GlossaryModule,
+    DocumentEditorModule,
   ],
   controllers: [AppController],
   providers: [
