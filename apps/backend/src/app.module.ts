@@ -50,6 +50,7 @@ import { DocumentEditorModule } from './modules/document-editor/document-editor.
 import { RedliningModule } from './modules/redlining/redlining.module';
 import { CollaborationModule } from './modules/collaboration/collaboration.module';
 import { SearchFacetsModule } from './modules/search-facets/search-facets.module';
+import { WorkspaceModule } from './modules/workspace/workspace.module';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { SearchFacetsModule } from './modules/search-facets/search-facets.module
     RedliningModule,
     CollaborationModule,
     SearchFacetsModule,
+    WorkspaceModule,
   ],
   controllers: [AppController],
   providers: [
