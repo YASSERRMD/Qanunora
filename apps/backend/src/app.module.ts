@@ -45,6 +45,7 @@ import { VotingModule } from './modules/voting/voting.module';
 import { PublicPortalModule } from './modules/public-portal/public-portal.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
 import { AiTranslationModule } from './modules/ai-translation/ai-translation.module';
+import { GlossaryModule } from './modules/glossary/glossary.module';
 
 @Module({
   imports: [
@@ -97,6 +98,7 @@ import { AiTranslationModule } from './modules/ai-translation/ai-translation.mod
     PublicPortalModule,
     ModerationModule,
     AiTranslationModule,
+    GlossaryModule,
   ],
   controllers: [AppController],
   providers: [
