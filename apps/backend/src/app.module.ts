@@ -53,6 +53,7 @@ import { SearchFacetsModule } from './modules/search-facets/search-facets.module
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { AdvancedAuditModule } from './modules/advanced-audit/advanced-audit.module';
 import { DataRetentionModule } from './modules/data-retention/data-retention.module';
+import { ClassificationModule } from './modules/classification/classification.module';
 
 @Module({
   imports: [
@@ -113,6 +114,7 @@ import { DataRetentionModule } from './modules/data-retention/data-retention.mod
     WorkspaceModule,
     AdvancedAuditModule,
     DataRetentionModule,
+    ClassificationModule,
   ],
   controllers: [AppController],
   providers: [

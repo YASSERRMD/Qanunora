@@ -265,6 +265,10 @@ model User {
   legalHoldsCreated      LegalHold[]     @relation("LegalHoldCreator")
   legalHoldsReleased     LegalHold[]     @relation("LegalHoldRelease")
   archivedItems          ArchivedItem[]  @relation("ArchiveCreator")
+  classifiedItems        ContentClassification[] @relation("Classifier")
+  declassifiedItems      ContentClassification[] @relation("Declassifier")
+  accessExceptions       AccessException[] @relation
+  grantedExceptions      AccessException[] @relation("ExceptionGrantor")
 
   @@map("users")
 }
@@ -383,6 +387,7 @@ model LegislativeItem {
   documentEdits       DocumentEdit[]
   editorComments      EditorComment[]
   redlineChanges      RedlineChange[]
+  classification      ContentClassification?
 
   @@index([status])
   @@index([type])
@@ -1531,6 +1536,53 @@ model AnonFeedback {
   @@index([consultationId])
   @@index([moderationStatus])
   @@map("anon_feedback")
+}
+
+// ============================================================
+// CLASSIFICATION AND CONFIDENTIALITY
+// ============================================================
+
+enum ClassificationLevel {
+  UNCLASSIFIED
+  RESTRICTED
+  CONFIDENTIAL
+  SECRET
+  TOP_SECRET
+}
+
+model ContentClassification {
+  id                  String             @id @default(uuid())
+  legislativeItemId   String             @unique
+  legislativeItem     LegislativeItem    @relation(fields: [legislativeItemId], references: [id])
+  classificationLevel ClassificationLevel @default(UNCLASSIFIED)
+  sensitiveFlags      String[]           @default([])
+  classifiedById      String
+  classifiedBy        User               @relation("Classifier", fields: [classifiedById], references: [id])
+  classifiedAt        DateTime           @default(now())
+  reviewDueDate       DateTime?
+  declassifiedById    String?
+  declassifiedBy      User?              @relation("Declassifier", fields: [declassifiedById], references: [id])
+  declassifiedAt      DateTime?
+  justification       String?
+  updatedAt           DateTime           @updatedAt
+
+  @@map("content_classifications")
+}
+
+model AccessException {
+  id                String   @id @default(uuid())
+  legislativeItemId String
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  grantedById       String
+  grantedBy         User     @relation("ExceptionGrantor", fields: [grantedById], references: [id])
+  reason            String
+  expiresAt         DateTime
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+
+  @@unique([legislativeItemId, userId])
+  @@map("access_exceptions")
 }
 
 // ============================================================
