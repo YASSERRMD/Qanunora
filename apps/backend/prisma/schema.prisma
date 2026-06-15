@@ -247,6 +247,8 @@ model User {
   opinionVersions        LegalOpinionVersion[] @relation("OpinionVersionAuthor")
   preparedSubmissions    CabinetSubmission[]   @relation("SubmissionPreparer")
   createdSessions        ParliamentarySession[] @relation("SessionCreator")
+  createdVoteEvents      VoteEvent[]           @relation("VoteCreator")
+  memberVotePositions    MemberVotePosition[]  @relation("VoteMember")
 
   @@map("users")
 }
@@ -359,6 +361,7 @@ model LegislativeItem {
   legalOpinions       LegalOpinion[]
   cabinetSubmissions  CabinetSubmission[]
   readingStages       ReadingStage[]
+  voteEvents          VoteEvent[]
 
   @@index([status])
   @@index([type])
@@ -1132,4 +1135,73 @@ model Debate {
   createdAt   DateTime             @default(now()) @map("created_at")
 
   @@map("debates")
+}
+
+// ============================================================
+// VOTING AND RESOLUTION TRACKING
+// ============================================================
+
+enum VoteResult {
+  PENDING
+  PASSED
+  FAILED
+  TIED
+  QUORUM_NOT_MET
+}
+
+enum VotePosition {
+  FOR
+  AGAINST
+  ABSTAIN
+}
+
+model VoteEvent {
+  id                String             @id @default(uuid())
+  title             String
+  description       String?
+  voteDate          DateTime           @map("vote_date")
+  legislativeItemId String?            @map("legislative_item_id")
+  legislativeItem   LegislativeItem?   @relation(fields: [legislativeItemId], references: [id])
+  sessionId         String?            @map("session_id")
+  totalFor          Int                @default(0) @map("total_for")
+  totalAgainst      Int                @default(0) @map("total_against")
+  totalAbstain      Int                @default(0) @map("total_abstain")
+  quorumRequired    Int?               @map("quorum_required")
+  result            VoteResult         @default(PENDING)
+  resolution        Resolution?
+  memberPositions   MemberVotePosition[]
+  createdById       String             @map("created_by_id")
+  createdBy         User               @relation("VoteCreator", fields: [createdById], references: [id])
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  @@map("vote_events")
+}
+
+model MemberVotePosition {
+  id          String       @id @default(uuid())
+  voteEventId String       @map("vote_event_id")
+  voteEvent   VoteEvent    @relation(fields: [voteEventId], references: [id], onDelete: Cascade)
+  memberId    String       @map("member_id")
+  member      User         @relation("VoteMember", fields: [memberId], references: [id])
+  position    VotePosition
+  note        String?
+  votedAt     DateTime     @default(now()) @map("voted_at")
+
+  @@unique([voteEventId, memberId])
+  @@map("member_vote_positions")
+}
+
+model Resolution {
+  id            String     @id @default(uuid())
+  voteEventId   String     @unique @map("vote_event_id")
+  voteEvent     VoteEvent  @relation(fields: [voteEventId], references: [id])
+  refNumber     String     @unique @map("ref_number")
+  title         String
+  text          String
+  effectiveDate DateTime?  @map("effective_date")
+  issuedAt      DateTime?  @map("issued_at")
+  createdAt     DateTime   @default(now()) @map("created_at")
+
+  @@map("resolutions")
 }
