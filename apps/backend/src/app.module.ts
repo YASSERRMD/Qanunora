@@ -41,6 +41,7 @@ import { DecisionRegisterModule } from './modules/decision-register/decision-reg
 import { LegalOpinionsModule } from './modules/legal-opinions/legal-opinions.module';
 import { CabinetSubmissionsModule } from './modules/cabinet-submissions/cabinet-submissions.module';
 import { ParliamentarySessionsModule } from './modules/parliamentary-sessions/parliamentary-sessions.module';
+import { VotingModule } from './modules/voting/voting.module';
 
 @Module({
   imports: [
@@ -89,6 +90,7 @@ import { ParliamentarySessionsModule } from './modules/parliamentary-sessions/pa
     LegalOpinionsModule,
     CabinetSubmissionsModule,
     ParliamentarySessionsModule,
+    VotingModule,
   ],
   controllers: [AppController],
   providers: [
