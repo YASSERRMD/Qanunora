@@ -262,6 +262,9 @@ model User {
   savedSearches          SavedSearch[]   @relation("SavedSearchUser")
   savedViews             SavedView[]     @relation("SavedViewUser")
   quickActions           WorkspaceQuickAction[] @relation("QuickActionUser")
+  legalHoldsCreated      LegalHold[]     @relation("LegalHoldCreator")
+  legalHoldsReleased     LegalHold[]     @relation("LegalHoldRelease")
+  archivedItems          ArchivedItem[]  @relation("ArchiveCreator")
 
   @@map("users")
 }
@@ -1528,6 +1531,67 @@ model AnonFeedback {
   @@index([consultationId])
   @@index([moderationStatus])
   @@map("anon_feedback")
+}
+
+// ============================================================
+// DATA RETENTION AND ARCHIVAL
+// ============================================================
+
+enum RetentionAction {
+  ARCHIVE
+  DELETE
+  EXPORT_AND_DELETE
+}
+
+model RetentionRule {
+  id             String          @id @default(uuid())
+  name           String          @unique
+  entityType     String
+  condition      Json
+  action         RetentionAction
+  retentionYears Int             @default(7)
+  isActive       Boolean         @default(true)
+  createdById    String
+  lastRunAt      DateTime?
+  nextRunAt      DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@map("retention_rules")
+}
+
+model LegalHold {
+  id           String    @id @default(uuid())
+  entityType   String
+  entityId     String
+  reason       String
+  heldById     String
+  heldBy       User      @relation("LegalHoldCreator", fields: [heldById], references: [id])
+  isActive     Boolean   @default(true)
+  expiresAt    DateTime?
+  releasedById String?
+  releasedBy   User?     @relation("LegalHoldRelease", fields: [releasedById], references: [id])
+  releasedAt   DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([entityType, entityId])
+  @@map("legal_holds")
+}
+
+model ArchivedItem {
+  id            String   @id @default(uuid())
+  entityType    String
+  entityId      String   @unique
+  archivedData  Json
+  archiveReason String
+  archivedById  String
+  archivedBy    User     @relation("ArchiveCreator", fields: [archivedById], references: [id])
+  restoredAt    DateTime?
+  restoredById  String?
+  archivedAt    DateTime @default(now())
+
+  @@map("archived_items")
 }
 
 // ============================================================
