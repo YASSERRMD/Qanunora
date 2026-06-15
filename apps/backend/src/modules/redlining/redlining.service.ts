@@ -5,16 +5,12 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
-import { NotificationsService } from '../notifications/notifications.service';
 import { RedlineStatus, RedlineType, NotificationType, EditType } from '@prisma/client';
 import { ProposeRedlineDto, ReviewRedlineDto } from './dto/redlining.dto';
 
 @Injectable()
 export class RedliningService {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly notifications: NotificationsService,
-  ) {}
+  constructor(private readonly prisma: PrismaService) {}
 
   async proposeChange(
     legislativeItemId: string,
@@ -43,12 +39,16 @@ export class RedliningService {
     if (dto.mentions && dto.mentions.length > 0) {
       await Promise.allSettled(
         dto.mentions.map((mentionedUserId) =>
-          this.notifications.create(mentionedUserId, {
-            type: NotificationType.COMMENT_ADDED,
-            title: 'You were mentioned in a redline proposal',
-            body: `You were mentioned in a redline change proposal for article: ${dto.articleRef ?? 'N/A'}`,
-            entityType: 'redline_change',
-            entityId: change.id,
+          this.prisma.notification.create({
+            data: {
+              userId: mentionedUserId,
+              type: NotificationType.COMMENT_ADDED,
+              title: 'You were mentioned in a redline proposal',
+              body: `You were mentioned in a redline change proposal for article: ${dto.articleRef ?? 'N/A'}`,
+              entityType: 'redline_change',
+              entityId: change.id,
+              isRead: false,
+            },
           }),
         ),
       );
