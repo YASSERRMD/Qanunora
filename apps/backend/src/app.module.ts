@@ -49,6 +49,7 @@ import { GlossaryModule } from './modules/glossary/glossary.module';
 import { DocumentEditorModule } from './modules/document-editor/document-editor.module';
 import { RedliningModule } from './modules/redlining/redlining.module';
 import { CollaborationModule } from './modules/collaboration/collaboration.module';
+import { SearchFacetsModule } from './modules/search-facets/search-facets.module';
 
 @Module({
   imports: [
@@ -105,6 +106,7 @@ import { CollaborationModule } from './modules/collaboration/collaboration.modul
     DocumentEditorModule,
     RedliningModule,
     CollaborationModule,
+    SearchFacetsModule,
   ],
   controllers: [AppController],
   providers: [
