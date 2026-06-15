@@ -331,6 +331,8 @@ model LegislativeItem {
   referenceNumber      String               @unique @map("reference_number")
   title                String
   titleAr              String?              @map("title_ar")
+  descriptionAr        String?              @map("description_ar")
+  summaryAr            String?              @map("summary_ar")
   type                 LegislativeItemType
   status               LegislativeStatus    @default(DRAFTING)
   confidentialityLevel ConfidentialityLevel @default(INTERNAL) @map("confidentiality_level")

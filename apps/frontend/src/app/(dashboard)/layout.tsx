@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth.store';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuthStore();
@@ -27,6 +28,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Language switcher — fixed top-right corner */}
+      <div className="fixed top-3 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
       {children}
     </div>
   );
