@@ -57,6 +57,16 @@ export class CreateLegislativeItemDto {
   @IsString()
   description?: string;
 
+  @ApiPropertyOptional({ description: 'Description in Arabic' })
+  @IsOptional()
+  @IsString()
+  descriptionAr?: string;
+
+  @ApiPropertyOptional({ description: 'Summary in Arabic' })
+  @IsOptional()
+  @IsString()
+  summaryAr?: string;
+
   @ApiPropertyOptional({ example: 'To standardize consumer protection across sectors' })
   @IsOptional()
   @IsString()

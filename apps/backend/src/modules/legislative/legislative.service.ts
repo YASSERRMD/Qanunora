@@ -43,6 +43,8 @@ export class LegislativeService {
         assignedToId: dto.assignedToId,
         createdById: userId,
         description: dto.description,
+        descriptionAr: dto.descriptionAr,
+        summaryAr: dto.summaryAr,
         objective: dto.objective,
         targetEnactmentDate: dto.targetEnactmentDate ? new Date(dto.targetEnactmentDate) : null,
       },
@@ -129,6 +131,8 @@ export class LegislativeService {
         ...(dto.priority !== undefined && { priority: dto.priority }),
         ...(dto.assignedToId !== undefined && { assignedToId: dto.assignedToId }),
         ...(dto.description !== undefined && { description: dto.description }),
+        ...(dto.descriptionAr !== undefined && { descriptionAr: dto.descriptionAr }),
+        ...(dto.summaryAr !== undefined && { summaryAr: dto.summaryAr }),
         ...(dto.objective !== undefined && { objective: dto.objective }),
         ...(dto.targetEnactmentDate !== undefined && {
           targetEnactmentDate: dto.targetEnactmentDate ? new Date(dto.targetEnactmentDate) : null,
