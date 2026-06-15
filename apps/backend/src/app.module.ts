@@ -56,6 +56,7 @@ import { DataRetentionModule } from './modules/data-retention/data-retention.mod
 import { ClassificationModule } from './modules/classification/classification.module';
 import { SecurityControlsModule } from './modules/security-controls/security-controls.module';
 import { SsoModule } from './modules/sso/sso.module';
+import { IntegrationsModule } from './modules/integrations/integrations.module';
 
 @Module({
   imports: [
@@ -119,6 +120,7 @@ import { SsoModule } from './modules/sso/sso.module';
     ClassificationModule,
     SecurityControlsModule,
     SsoModule,
+    IntegrationsModule,
   ],
   controllers: [AppController],
   providers: [
