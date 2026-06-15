@@ -246,6 +246,7 @@ model User {
   assignedOpinions       LegalOpinion[]        @relation("OpinionAssignee")
   opinionVersions        LegalOpinionVersion[] @relation("OpinionVersionAuthor")
   preparedSubmissions    CabinetSubmission[]   @relation("SubmissionPreparer")
+  createdSessions        ParliamentarySession[] @relation("SessionCreator")
 
   @@map("users")
 }
@@ -357,6 +358,7 @@ model LegislativeItem {
   calendarEvents      CalendarEvent[]
   legalOpinions       LegalOpinion[]
   cabinetSubmissions  CabinetSubmission[]
+  readingStages       ReadingStage[]
 
   @@index([status])
   @@index([type])
@@ -1064,4 +1066,70 @@ model SubmissionChecklist {
   order          Int
 
   @@map("submission_checklist")
+}
+
+// ============================================================
+// PARLIAMENTARY SESSION TRACKING
+// ============================================================
+
+enum SessionType {
+  ORDINARY
+  EXTRAORDINARY
+  EMERGENCY
+}
+
+enum SessionStatus {
+  UPCOMING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+model ParliamentarySession {
+  id            String         @id @default(uuid())
+  sessionNumber String         @unique @map("session_number")
+  title         String
+  sessionType   SessionType    @map("session_type")
+  startDate     DateTime       @map("start_date")
+  endDate       DateTime?      @map("end_date")
+  status        SessionStatus  @default(UPCOMING)
+  readingStages ReadingStage[]
+  debates       Debate[]
+  notes         String?
+  createdById   String         @map("created_by_id")
+  createdBy     User           @relation("SessionCreator", fields: [createdById], references: [id])
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  @@map("parliamentary_sessions")
+}
+
+model ReadingStage {
+  id                String               @id @default(uuid())
+  sessionId         String               @map("session_id")
+  session           ParliamentarySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  legislativeItemId String               @map("legislative_item_id")
+  legislativeItem   LegislativeItem      @relation(fields: [legislativeItemId], references: [id])
+  stageNumber       Int                  @map("stage_number")
+  stageName         String               @map("stage_name")
+  scheduledDate     DateTime?            @map("scheduled_date")
+  completedDate     DateTime?            @map("completed_date")
+  outcome           String?
+  createdAt         DateTime             @default(now()) @map("created_at")
+
+  @@map("reading_stages")
+}
+
+model Debate {
+  id          String               @id @default(uuid())
+  sessionId   String               @map("session_id")
+  session     ParliamentarySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  topic       String
+  summary     String?
+  speakerName String?              @map("speaker_name")
+  position    String?
+  debateDate  DateTime             @map("debate_date")
+  createdAt   DateTime             @default(now()) @map("created_at")
+
+  @@map("debates")
 }
