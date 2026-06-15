@@ -51,6 +51,7 @@ import { RedliningModule } from './modules/redlining/redlining.module';
 import { CollaborationModule } from './modules/collaboration/collaboration.module';
 import { SearchFacetsModule } from './modules/search-facets/search-facets.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
+import { AdvancedAuditModule } from './modules/advanced-audit/advanced-audit.module';
 
 @Module({
   imports: [
@@ -109,6 +110,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
     CollaborationModule,
     SearchFacetsModule,
     WorkspaceModule,
+    AdvancedAuditModule,
   ],
   controllers: [AppController],
   providers: [
