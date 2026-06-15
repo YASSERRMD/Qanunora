@@ -1823,3 +1823,53 @@ model AuditRetentionPolicy {
 
   @@map("audit_retention_policies")
 }
+
+// ============================================================
+// API INTEGRATION FRAMEWORK
+// ============================================================
+
+enum IntegrationAuthType {
+  API_KEY
+  BEARER_TOKEN
+  BASIC_AUTH
+  OAUTH2
+  NONE
+}
+
+enum LogDirection {
+  OUTBOUND
+  INBOUND
+}
+
+model ExternalIntegration {
+  id              String              @id @default(uuid())
+  name            String              @unique
+  description     String?
+  baseUrl         String
+  authType        IntegrationAuthType @default(API_KEY)
+  authConfig      Json                @default("{}")
+  headers         Json                @default("{}")
+  isActive        Boolean             @default(true)
+  webhooks        WebhookSubscription[]
+  integrationLogs IntegrationLog[]
+  createdById     String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+
+  @@map("external_integrations")
+}
+
+model WebhookSubscription {
+  id              String              @id @default(uuid())
+  integrationId   String
+  integration     ExternalIntegration @relation(fields: [integrationId], references: [id], onDelete: Cascade)
+  eventType       String
+  targetUrl       String
+  secret          String?
+  isActive        Boolean             @default(true)
+  maxRetries      Int                 @default(3)
+  lastTriggeredAt DateTime?
+  createdAt       DateTime            @default(now())
+
+  @@map("webhook_subscriptions")
+}
