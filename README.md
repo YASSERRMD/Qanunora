@@ -6,7 +6,7 @@
 
 ## Overview
 
-Qanunora manages the complete legislative lifecycle through 30 integrated modules:
+Qanunora manages the complete legislative lifecycle through 60 integrated modules:
 
 - Draft laws, bills, amendments, regulations, cabinet decisions, circulars, and policy drafts
 - Committee reviews, stakeholder consultations, and public feedback management
@@ -289,7 +289,7 @@ The API is versioned at `/api/v1/`. Full interactive documentation at `/api/docs
 
 ---
 
-## Modules (30 Phases)
+## Modules (60 Phases)
 
 | # | Module | Description |
 |---|--------|-------------|
@@ -322,7 +322,37 @@ The API is versioned at `/api/v1/`. Full interactive documentation at `/api/docs
 | 27 | Reporting | Lifecycle, consultation, impact, amendment, audit, ministry reports |
 | 28 | Admin Configuration | System settings, workflow config, ministry management, security |
 | 29 | Security Hardening | Rate limiting, CSP, API key encryption, file security, audit |
-| 30 | Documentation | This document + architecture, API, deployment guides |
+| 30 | Documentation | Architecture, API, deployment guides |
+| 31 | Multi-Tenancy | Tenant isolation, ministry RBAC, tenant-scoped settings |
+| 32 | Organization Chart | Departments, units, hierarchy management |
+| 33 | Dashboard | Executive KPI cards, activity feed, quick actions |
+| 34 | Calendar & Events | Legislative calendar, deadlines, reminders |
+| 35 | Meetings Management | Agendas, minutes, decisions, action items |
+| 36 | Decision Register | Formal decision records, linked items, status tracking |
+| 37 | Legal Opinion Management | Opinion requests, drafting workflow, version history |
+| 38 | Cabinet Submissions | Submission packages, pre-approval checklist, tracking |
+| 39 | Parliamentary Sessions | Session tracking, reading stages, debate records |
+| 40 | Voting & Resolutions | Vote events, member positions, resolution issuance |
+| 41 | Public Portal | Public legislative portal, citizen feedback |
+| 42 | Moderation | Spam detection, AI moderation scores, queue management |
+| 43 | AI Translation | Bilingual AR/EN with translation memory and glossary |
+| 44 | Legal Glossary | Bilingual term registry, domain classification |
+| 45 | Document Editor | Rich text editing, autosave, collaborative locking |
+| 46 | Redlining | Track changes, accept/reject, reviewer comments |
+| 47 | Collaboration | Real-time document co-editing, presence indicators |
+| 48 | Search Facets | Advanced multi-filter search, saved searches, views |
+| 49 | Personal Workspace | Saved views, quick actions, pinned items |
+| 50 | Advanced Audit | Immutable ledger, hash chain, tamper evidence |
+| 51 | Data Retention | Retention rules, legal holds, archival workflow |
+| 52 | Classification | Content security classification, access exceptions |
+| 53 | Security Controls | Session management, MFA, IP restrictions, activity monitoring |
+| 54 | SSO Integration | OIDC, SAML, LDAP with JIT provisioning |
+| 55 | Final Documentation | Deployment guide, AI provider guide, architecture diagram |
+| 56 | API Integration Framework | External integrations, outbound webhooks with HMAC, inbound receiver |
+| 57 | Government Registry Integrations | Entity, Ministry, Gazette, Legal Reference, Personnel registries |
+| 58 | Official Gazette Publication | Gazette workflow, publication checklist, public archive |
+| 59 | Advanced Analytics & BI | Comprehensive KPIs, trend analysis, BI export (JSON/CSV) |
+| 60 | Enterprise Deployment Hardening | Production Dockerfiles, Kubernetes, Helm, readiness probes |
 
 ---
 

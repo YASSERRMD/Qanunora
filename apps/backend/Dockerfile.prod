@@ -1,0 +1,20 @@
+FROM node:20-alpine AS builder
+WORKDIR /app
+COPY package*.json ./
+COPY apps/backend/package*.json ./apps/backend/
+COPY packages/shared/package*.json ./packages/shared/
+RUN npm ci --workspace=apps/backend --workspace=packages/shared
+COPY . .
+RUN npm run build --workspace=packages/shared
+RUN npm run build --workspace=apps/backend
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=builder /app/apps/backend/dist ./dist
+COPY --from=builder /app/apps/backend/prisma ./prisma
+COPY --from=builder /app/node_modules ./node_modules
+EXPOSE 3001
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD wget -qO- http://localhost:3001/api/health || exit 1
+CMD ["node", "dist/main.js"]

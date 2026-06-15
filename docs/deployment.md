@@ -190,3 +190,73 @@ For high availability:
 3. Use S3 for document storage (not local filesystem)
 4. Enable read replicas on PostgreSQL for reporting queries
 5. Deploy BullMQ workers as separate services
+
+## Kubernetes Deployment
+
+### Prerequisites
+
+- `kubectl` configured for your cluster
+- `helm` v3+
+- Container images pushed to registry
+- Secrets populated (copy from `infra/k8s/secrets.yaml.example`)
+
+### Quick Deploy with kubectl
+
+```bash
+# Apply all manifests
+make k8s-apply
+
+# Check status
+make k8s-status
+
+# View logs
+kubectl logs -n qanunora -l app=qanunora-backend -f
+```
+
+### Helm Deployment
+
+```bash
+# First time install
+make helm-install
+
+# Upgrade
+make helm-upgrade
+
+# Override values
+helm upgrade qanunora infra/helm/ \
+  --namespace qanunora \
+  --set backend.image.tag=v2.0.0 \
+  --set frontend.image.tag=v2.0.0 \
+  --set secrets.databaseUrl="postgresql://..."
+```
+
+### Build Production Docker Images
+
+```bash
+# Build both images
+make docker-build-backend IMAGE_TAG=v1.0.0
+make docker-build-frontend IMAGE_TAG=v1.0.0
+
+# Push to registry
+docker push ghcr.io/yasserrmd/qanunora-backend:v1.0.0
+docker push ghcr.io/yasserrmd/qanunora-frontend:v1.0.0
+```
+
+### Health and Readiness Probes
+
+| Endpoint | Path | Purpose |
+|----------|------|---------|
+| Liveness | `GET /api/health` | Pod restart trigger |
+| Readiness | `GET /api/readiness` | Traffic routing gate |
+
+The readiness endpoint checks:
+- PostgreSQL connectivity (`SELECT 1`)
+- Redis availability
+
+```bash
+# Manual check
+curl https://api.qanunora.gov/api/readiness
+# {"ready":true,"checks":{"database":true,"redis":true},"timestamp":"..."}
+```
+
+See [observability.md](./observability.md) for monitoring setup and [backup-restore.md](./backup-restore.md) for backup procedures.

@@ -60,6 +60,7 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { RegistryAdaptersModule } from './modules/registry-adapters/registry-adapters.module';
 import { GazetteModule } from './modules/gazette/gazette.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { HealthModule } from './modules/health/health.module';
 
 @Module({
   imports: [
@@ -127,6 +128,7 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
     RegistryAdaptersModule,
     GazetteModule,
     AnalyticsModule,
+    HealthModule,
   ],
   controllers: [AppController],
   providers: [

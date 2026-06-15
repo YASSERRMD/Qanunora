@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qanunora-frontend
+  namespace: qanunora
+  labels:
+    app: qanunora-frontend
+    app.kubernetes.io/name: qanunora
+    app.kubernetes.io/component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: qanunora-frontend
+  template:
+    metadata:
+      labels:
+        app: qanunora-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: ghcr.io/yasserrmd/qanunora-frontend:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: qanunora-config
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "125m"
+            limits:
+              memory: "256Mi"
+              cpu: "250m"
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qanunora-frontend
+  namespace: qanunora
+  labels:
+    app: qanunora-frontend
+spec:
+  selector:
+    app: qanunora-frontend
+  ports:
+    - port: 3000
+      targetPort: 3000
+      protocol: TCP
+  type: ClusterIP
