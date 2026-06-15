@@ -55,6 +55,7 @@ import { AdvancedAuditModule } from './modules/advanced-audit/advanced-audit.mod
 import { DataRetentionModule } from './modules/data-retention/data-retention.module';
 import { ClassificationModule } from './modules/classification/classification.module';
 import { SecurityControlsModule } from './modules/security-controls/security-controls.module';
+import { SsoModule } from './modules/sso/sso.module';
 
 @Module({
   imports: [
@@ -117,6 +118,7 @@ import { SecurityControlsModule } from './modules/security-controls/security-con
     DataRetentionModule,
     ClassificationModule,
     SecurityControlsModule,
+    SsoModule,
   ],
   controllers: [AppController],
   providers: [
