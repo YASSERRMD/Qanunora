@@ -39,6 +39,7 @@ import { CalendarModule } from './modules/calendar/calendar.module';
 import { MeetingsModule } from './modules/meetings/meetings.module';
 import { DecisionRegisterModule } from './modules/decision-register/decision-register.module';
 import { LegalOpinionsModule } from './modules/legal-opinions/legal-opinions.module';
+import { CabinetSubmissionsModule } from './modules/cabinet-submissions/cabinet-submissions.module';
 
 @Module({
   imports: [
@@ -85,6 +86,7 @@ import { LegalOpinionsModule } from './modules/legal-opinions/legal-opinions.mod
     MeetingsModule,
     DecisionRegisterModule,
     LegalOpinionsModule,
+    CabinetSubmissionsModule,
   ],
   controllers: [AppController],
   providers: [

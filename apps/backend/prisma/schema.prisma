@@ -245,6 +245,7 @@ model User {
   requestedOpinions      LegalOpinion[]        @relation("OpinionRequester")
   assignedOpinions       LegalOpinion[]        @relation("OpinionAssignee")
   opinionVersions        LegalOpinionVersion[] @relation("OpinionVersionAuthor")
+  preparedSubmissions    CabinetSubmission[]   @relation("SubmissionPreparer")
 
   @@map("users")
 }
@@ -353,8 +354,9 @@ model LegislativeItem {
   regulatoryRefs   RegulatoryReference[]
   traceLinks       TraceLink[]
   chatSessions     ChatSession[]
-  calendarEvents   CalendarEvent[]
-  legalOpinions    LegalOpinion[]
+  calendarEvents      CalendarEvent[]
+  legalOpinions       LegalOpinion[]
+  cabinetSubmissions  CabinetSubmission[]
 
   @@index([status])
   @@index([type])
@@ -1016,4 +1018,50 @@ model LegalOpinionVersion {
 
   @@unique([opinionId, versionNumber])
   @@map("legal_opinion_versions")
+}
+
+// ============================================================
+// CABINET SUBMISSION PACKAGE
+// ============================================================
+
+enum SubmissionStatus {
+  PREPARING
+  UNDER_REVIEW
+  APPROVED
+  SUBMITTED
+  RETURNED
+}
+
+model CabinetSubmission {
+  id                String              @id @default(uuid())
+  referenceNumber   String              @unique @map("reference_number")
+  legislativeItemId String              @map("legislative_item_id")
+  legislativeItem   LegislativeItem     @relation(fields: [legislativeItemId], references: [id])
+  title             String
+  status            SubmissionStatus    @default(PREPARING)
+  checklist         SubmissionChecklist[]
+  preparedById      String              @map("prepared_by_id")
+  preparedBy        User                @relation("SubmissionPreparer", fields: [preparedById], references: [id])
+  submittedAt       DateTime?           @map("submitted_at")
+  approvedAt        DateTime?           @map("approved_at")
+  notes             String?
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  @@map("cabinet_submissions")
+}
+
+model SubmissionChecklist {
+  id             String            @id @default(uuid())
+  submissionId   String            @map("submission_id")
+  submission     CabinetSubmission @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  item           String
+  category       String
+  isCompleted    Boolean           @default(false) @map("is_completed")
+  completedById  String?           @map("completed_by_id")
+  completedAt    DateTime?         @map("completed_at")
+  evidence       String?
+  order          Int
+
+  @@map("submission_checklist")
 }
