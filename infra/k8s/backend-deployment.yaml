@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qanunora-backend
+  namespace: qanunora
+  labels:
+    app: qanunora-backend
+    app.kubernetes.io/name: qanunora
+    app.kubernetes.io/component: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: qanunora-backend
+  template:
+    metadata:
+      labels:
+        app: qanunora-backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/yasserrmd/qanunora-backend:latest
+          ports:
+            - containerPort: 3001
+          envFrom:
+            - configMapRef:
+                name: qanunora-config
+            - secretRef:
+                name: qanunora-secrets
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          readinessProbe:
+            httpGet:
+              path: /api/readiness
+              port: 3001
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3001
+            initialDelaySeconds: 40
+            periodSeconds: 30
+            failureThreshold: 3
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh", "-c", "sleep 10"]
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: qanunora-backend
+  namespace: qanunora
+  labels:
+    app: qanunora-backend
+spec:
+  selector:
+    app: qanunora-backend
+  ports:
+    - port: 3001
+      targetPort: 3001
+      protocol: TCP
+  type: ClusterIP
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: qanunora-backend-hpa
+  namespace: qanunora
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: qanunora-backend
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
