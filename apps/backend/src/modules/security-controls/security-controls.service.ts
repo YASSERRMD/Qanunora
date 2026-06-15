@@ -11,7 +11,8 @@ export class SecurityControlsService {
   async createSession(
     userId: string,
     token: string,
-    deviceInfo: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    deviceInfo: any,
     ipAddress: string | undefined,
     userAgent: string | undefined,
     expiresAt: Date,
@@ -144,7 +145,8 @@ export class SecurityControlsService {
 
   async recordSuspiciousActivity(
     type: 'BRUTE_FORCE' | 'UNUSUAL_LOCATION' | 'MASS_EXPORT' | 'PRIVILEGE_ESCALATION' | 'OFF_HOURS_ACCESS',
-    details: Record<string, unknown>,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    details: any,
     userId?: string,
     email?: string,
     ipAddress?: string,
