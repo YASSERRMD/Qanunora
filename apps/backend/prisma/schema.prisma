@@ -250,6 +250,8 @@ model User {
   createdVoteEvents      VoteEvent[]           @relation("VoteCreator")
   memberVotePositions    MemberVotePosition[]  @relation("VoteMember")
   moderatedFeedback      AnonFeedback[]
+  reviewedTranslations   TranslationRequest[]  @relation("TranslationReviewer")
+  createdTranslations    TranslationRequest[]  @relation("TranslationCreator")
 
   @@map("users")
 }
@@ -1208,6 +1210,64 @@ model Resolution {
   createdAt     DateTime   @default(now()) @map("created_at")
 
   @@map("resolutions")
+}
+
+// ============================================================
+// AI TRANSLATION
+// ============================================================
+
+enum TranslationStatus {
+  PENDING
+  COMPLETED
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+}
+
+model TranslationMemory {
+  id             String               @id @default(uuid())
+  sourceText     String
+  translatedText String               @map("translated_text")
+  sourceLang     String               @map("source_lang")
+  targetLang     String               @map("target_lang")
+  domain         String               @default("legal")
+  usageCount     Int                  @default(1) @map("usage_count")
+  requests       TranslationRequest[]
+  createdAt      DateTime             @default(now()) @map("created_at")
+  updatedAt      DateTime             @updatedAt @map("updated_at")
+
+  @@unique([sourceText, sourceLang, targetLang])
+  @@map("translation_memory")
+}
+
+model TranslationRequest {
+  id             String            @id @default(uuid())
+  sourceText     String            @map("source_text")
+  sourceLang     String            @default("ar") @map("source_lang")
+  targetLang     String            @default("en") @map("target_lang")
+  domain         String            @default("legal")
+  translatedText String?           @map("translated_text")
+  confidenceScore Float?           @map("confidence_score")
+  provider       String?
+  model          String?
+  status         TranslationStatus @default(PENDING)
+  reviewedById   String?           @map("reviewed_by_id")
+  reviewedBy     User?             @relation("TranslationReviewer", fields: [reviewedById], references: [id])
+  reviewedAt     DateTime?         @map("reviewed_at")
+  reviewNotes    String?           @map("review_notes")
+  isApproved     Boolean           @default(false) @map("is_approved")
+  memoryEntryId  String?           @map("memory_entry_id")
+  memoryEntry    TranslationMemory? @relation(fields: [memoryEntryId], references: [id])
+  entityType     String?           @map("entity_type")
+  entityId       String?           @map("entity_id")
+  createdById    String            @map("created_by_id")
+  createdBy      User              @relation("TranslationCreator", fields: [createdById], references: [id])
+  createdAt      DateTime          @default(now()) @map("created_at")
+  updatedAt      DateTime          @updatedAt @map("updated_at")
+
+  @@index([status])
+  @@index([createdById])
+  @@map("translation_requests")
 }
 
 // ============================================================

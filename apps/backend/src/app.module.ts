@@ -44,6 +44,7 @@ import { ParliamentarySessionsModule } from './modules/parliamentary-sessions/pa
 import { VotingModule } from './modules/voting/voting.module';
 import { PublicPortalModule } from './modules/public-portal/public-portal.module';
 import { ModerationModule } from './modules/moderation/moderation.module';
+import { AiTranslationModule } from './modules/ai-translation/ai-translation.module';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { ModerationModule } from './modules/moderation/moderation.module';
     VotingModule,
     PublicPortalModule,
     ModerationModule,
+    AiTranslationModule,
   ],
   controllers: [AppController],
   providers: [
