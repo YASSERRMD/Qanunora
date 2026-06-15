@@ -34,6 +34,7 @@ import { ReportingModule } from './modules/reporting/reporting.module';
 import { AdminModule } from './modules/admin/admin.module';
 import { TenancyModule } from './modules/tenancy/tenancy.module';
 import { OrganizationModule } from './modules/organization/organization.module';
+import { DashboardModule } from './modules/dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -75,6 +76,7 @@ import { OrganizationModule } from './modules/organization/organization.module';
     AdminModule,
     TenancyModule,
     OrganizationModule,
+    DashboardModule,
   ],
   controllers: [AppController],
   providers: [
