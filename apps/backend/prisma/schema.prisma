@@ -259,6 +259,7 @@ model User {
   reviewedRedlines       RedlineChange[] @relation("RedlineReviewer")
   documentLocks          DocumentLock[]  @relation("DocumentLockUser")
   autosaveSnapshots      AutosaveSnapshot[] @relation("AutosaveUser")
+  savedSearches          SavedSearch[]   @relation("SavedSearchUser")
 
   @@map("users")
 }
@@ -1313,6 +1314,28 @@ model TranslationRequest {
   @@index([status])
   @@index([createdById])
   @@map("translation_requests")
+}
+
+// ============================================================
+// SAVED SEARCHES
+// ============================================================
+
+model SavedSearch {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation("SavedSearchUser", fields: [userId], references: [id])
+  name        String
+  query       String
+  filters     Json     @default("{}")
+  searchType  String   @default("keyword")
+  hitCount    Int      @default(0)
+  lastRunAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@map("saved_searches")
 }
 
 // ============================================================
