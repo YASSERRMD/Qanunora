@@ -242,6 +242,9 @@ model User {
   meetingAttendances     MeetingAttendee[]     @relation("MeetingAttendees")
   ownedDecisions         DecisionRecord[]      @relation("DecisionOwner")
   createdDecisions       DecisionRecord[]      @relation("DecisionCreator")
+  requestedOpinions      LegalOpinion[]        @relation("OpinionRequester")
+  assignedOpinions       LegalOpinion[]        @relation("OpinionAssignee")
+  opinionVersions        LegalOpinionVersion[] @relation("OpinionVersionAuthor")
 
   @@map("users")
 }
@@ -351,6 +354,7 @@ model LegislativeItem {
   traceLinks       TraceLink[]
   chatSessions     ChatSession[]
   calendarEvents   CalendarEvent[]
+  legalOpinions    LegalOpinion[]
 
   @@index([status])
   @@index([type])
@@ -960,4 +964,56 @@ model DecisionLink {
   createdAt  DateTime       @default(now()) @map("created_at")
 
   @@map("decision_links")
+}
+
+// ============================================================
+// LEGAL OPINION MANAGEMENT
+// ============================================================
+
+enum OpinionStatus {
+  REQUESTED
+  ASSIGNED
+  DRAFTING
+  UNDER_REVIEW
+  APPROVED
+  ISSUED
+  WITHDRAWN
+}
+
+model LegalOpinion {
+  id                String              @id @default(uuid())
+  referenceNumber   String              @unique @map("reference_number")
+  subject           String
+  requestedById     String              @map("requested_by_id")
+  requestedBy       User                @relation("OpinionRequester", fields: [requestedById], references: [id])
+  assignedToId      String?             @map("assigned_to_id")
+  assignedTo        User?               @relation("OpinionAssignee", fields: [assignedToId], references: [id])
+  legislativeItemId String?             @map("legislative_item_id")
+  legislativeItem   LegislativeItem?    @relation(fields: [legislativeItemId], references: [id])
+  status            OpinionStatus       @default(REQUESTED)
+  priority          Priority            @default(MEDIUM)
+  dueDate           DateTime?           @map("due_date")
+  versions          LegalOpinionVersion[]
+  references        String[]            @default([])
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+
+  @@map("legal_opinions")
+}
+
+model LegalOpinionVersion {
+  id            String       @id @default(uuid())
+  opinionId     String       @map("opinion_id")
+  opinion       LegalOpinion @relation(fields: [opinionId], references: [id], onDelete: Cascade)
+  versionNumber Int          @map("version_number")
+  content       String
+  authorId      String       @map("author_id")
+  author        User         @relation("OpinionVersionAuthor", fields: [authorId], references: [id])
+  isApproved    Boolean      @default(false) @map("is_approved")
+  approvedById  String?      @map("approved_by_id")
+  approvedAt    DateTime?    @map("approved_at")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  @@unique([opinionId, versionNumber])
+  @@map("legal_opinion_versions")
 }
