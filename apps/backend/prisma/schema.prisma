@@ -260,6 +260,8 @@ model User {
   documentLocks          DocumentLock[]  @relation("DocumentLockUser")
   autosaveSnapshots      AutosaveSnapshot[] @relation("AutosaveUser")
   savedSearches          SavedSearch[]   @relation("SavedSearchUser")
+  savedViews             SavedView[]     @relation("SavedViewUser")
+  quickActions           WorkspaceQuickAction[] @relation("QuickActionUser")
 
   @@map("users")
 }
@@ -1314,6 +1316,43 @@ model TranslationRequest {
   @@index([status])
   @@index([createdById])
   @@map("translation_requests")
+}
+
+// ============================================================
+// PERSONAL WORKSPACE
+// ============================================================
+
+model SavedView {
+  id           String   @id @default(uuid())
+  userId       String
+  user         User     @relation("SavedViewUser", fields: [userId], references: [id])
+  name         String
+  entityType   String
+  filters      Json     @default("{}")
+  columnConfig Json     @default("[]")
+  sortField    String?
+  sortOrder    String?  @default("desc")
+  isDefault    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([userId, name, entityType])
+  @@index([userId])
+  @@map("saved_views")
+}
+
+model WorkspaceQuickAction {
+  id         String   @id @default(uuid())
+  userId     String
+  user       User     @relation("QuickActionUser", fields: [userId], references: [id])
+  label      String
+  actionType String
+  actionData Json     @default("{}")
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@map("workspace_quick_actions")
 }
 
 // ============================================================
