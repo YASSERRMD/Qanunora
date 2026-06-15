@@ -255,6 +255,8 @@ model User {
   glossaryTerms          GlossaryTerm[]
   documentEdits          DocumentEdit[]  @relation("DocumentEditorUser")
   editorComments         EditorComment[] @relation("EditorCommentAuthor")
+  proposedRedlines       RedlineChange[] @relation("RedlineProposer")
+  reviewedRedlines       RedlineChange[] @relation("RedlineReviewer")
 
   @@map("users")
 }
@@ -372,6 +374,7 @@ model LegislativeItem {
   voteEvents          VoteEvent[]
   documentEdits       DocumentEdit[]
   editorComments      EditorComment[]
+  redlineChanges      RedlineChange[]
 
   @@index([status])
   @@index([type])
@@ -1308,6 +1311,49 @@ model TranslationRequest {
   @@index([status])
   @@index([createdById])
   @@map("translation_requests")
+}
+
+// ============================================================
+// REDLINING
+// ============================================================
+
+enum RedlineType {
+  INSERTION
+  DELETION
+  MODIFICATION
+  COMMENT
+}
+
+enum RedlineStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+model RedlineChange {
+  id                String         @id @default(uuid())
+  legislativeItemId String
+  legislativeItem   LegislativeItem @relation(fields: [legislativeItemId], references: [id])
+  proposedById      String
+  proposedBy        User           @relation("RedlineProposer", fields: [proposedById], references: [id])
+  originalText      String
+  proposedText      String
+  changeType        RedlineType    @default(MODIFICATION)
+  articleRef        String?
+  rationale         String?
+  status            RedlineStatus  @default(PENDING)
+  reviewedById      String?
+  reviewedBy        User?          @relation("RedlineReviewer", fields: [reviewedById], references: [id])
+  reviewedAt        DateTime?
+  reviewNote        String?
+  mentions          String[]       @default([])
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+
+  @@index([legislativeItemId])
+  @@index([status])
+  @@map("redline_changes")
 }
 
 // ============================================================
