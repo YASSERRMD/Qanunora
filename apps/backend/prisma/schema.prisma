@@ -273,6 +273,8 @@ model User {
   loginHistory           LoginHistory[]          @relation("LoginHistory")
   ipRestrictions         IpRestriction[]         @relation("IpRestrictionCreator")
   idpUserMappings        IdpUserMapping[]        @relation("IdpUserMappings")
+  gazetteApprovals       GazetteEntry[]          @relation("GazetteApprover")
+  gazetteEntries         GazetteEntry[]          @relation("GazetteCreator")
 
   @@map("users")
 }
@@ -392,6 +394,7 @@ model LegislativeItem {
   editorComments      EditorComment[]
   redlineChanges      RedlineChange[]
   classification      ContentClassification?
+  gazetteEntry        GazetteEntry?
 
   @@index([status])
   @@index([type])
@@ -1946,4 +1949,54 @@ model RegistrySyncLog {
   completedAt DateTime?
 
   @@map("registry_sync_logs")
+}
+
+// ============================================================
+// OFFICIAL GAZETTE PUBLICATION
+// ============================================================
+
+enum GazetteStatus {
+  PREPARING
+  READINESS_CHECK
+  PENDING_APPROVAL
+  APPROVED
+  PUBLISHED
+  RETRACTED
+}
+
+model GazetteEntry {
+  id                String           @id @default(uuid())
+  gazetteNumber     String           @unique
+  issueDate         DateTime?
+  legislativeItemId String           @unique
+  legislativeItem   LegislativeItem  @relation(fields: [legislativeItemId], references: [id])
+  title             String
+  titleAr           String?
+  effectiveDate     DateTime?
+  publicationStatus GazetteStatus    @default(PREPARING)
+  checklist         GazetteChecklist[]
+  approvedById      String?
+  approvedBy        User?            @relation("GazetteApprover", fields: [approvedById], references: [id])
+  approvedAt        DateTime?
+  publishedAt       DateTime?
+  archiveUrl        String?
+  metadata          Json             @default("{}")
+  createdById       String
+  createdBy         User             @relation("GazetteCreator", fields: [createdById], references: [id])
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@map("gazette_entries")
+}
+
+model GazetteChecklist {
+  id          String       @id @default(uuid())
+  gazetteId   String
+  gazette     GazetteEntry @relation(fields: [gazetteId], references: [id], onDelete: Cascade)
+  item        String
+  isCompleted Boolean      @default(false)
+  completedAt DateTime?
+  order       Int
+
+  @@map("gazette_checklist")
 }
