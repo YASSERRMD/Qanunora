@@ -128,7 +128,7 @@ export class SearchFacetsService {
         userId,
         name: dto.name,
         query: dto.query,
-        filters: dto.filters ?? {},
+        filters: (dto.filters ?? {}) as object,
         searchType: dto.searchType ?? 'keyword',
       },
     });
