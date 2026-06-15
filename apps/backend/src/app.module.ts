@@ -43,6 +43,7 @@ import { CabinetSubmissionsModule } from './modules/cabinet-submissions/cabinet-
 import { ParliamentarySessionsModule } from './modules/parliamentary-sessions/parliamentary-sessions.module';
 import { VotingModule } from './modules/voting/voting.module';
 import { PublicPortalModule } from './modules/public-portal/public-portal.module';
+import { ModerationModule } from './modules/moderation/moderation.module';
 
 @Module({
   imports: [
@@ -93,6 +94,7 @@ import { PublicPortalModule } from './modules/public-portal/public-portal.module
     ParliamentarySessionsModule,
     VotingModule,
     PublicPortalModule,
+    ModerationModule,
   ],
   controllers: [AppController],
   providers: [
