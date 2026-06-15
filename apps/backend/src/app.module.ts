@@ -54,6 +54,7 @@ import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { AdvancedAuditModule } from './modules/advanced-audit/advanced-audit.module';
 import { DataRetentionModule } from './modules/data-retention/data-retention.module';
 import { ClassificationModule } from './modules/classification/classification.module';
+import { SecurityControlsModule } from './modules/security-controls/security-controls.module';
 
 @Module({
   imports: [
@@ -115,6 +116,7 @@ import { ClassificationModule } from './modules/classification/classification.mo
     AdvancedAuditModule,
     DataRetentionModule,
     ClassificationModule,
+    SecurityControlsModule,
   ],
   controllers: [AppController],
   providers: [
