@@ -125,6 +125,20 @@ enum NotificationType {
   SYSTEM
 }
 
+enum MeetingStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum ActionItemStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
 enum EventType {
   REVIEW_DEADLINE
   CONSULTATION_DEADLINE
@@ -224,6 +238,8 @@ model User {
   approvedAmendments    Amendment[]            @relation("AmendmentApprovedBy")
   assignedCalendarEvents CalendarEvent[]       @relation("EventAssignee")
   createdCalendarEvents  CalendarEvent[]       @relation("EventCreator")
+  createdMeetings        Meeting[]             @relation("MeetingCreator")
+  meetingAttendances     MeetingAttendee[]     @relation("MeetingAttendees")
 
   @@map("users")
 }
@@ -430,6 +446,7 @@ model Committee {
 
   members     CommitteeMember[]
   reviews     CommitteeReview[]
+  meetings    Meeting[]
 
   @@map("committees")
 }
@@ -806,4 +823,98 @@ model CalendarEvent {
   @@index([eventType])
   @@index([assignedToId])
   @@map("calendar_events")
+}
+
+// ============================================================
+// MEETINGS
+// ============================================================
+
+model Meeting {
+  id          String        @id @default(uuid())
+  title       String
+  description String?
+  meetingDate DateTime      @map("meeting_date")
+  location    String?
+  committeeId String?       @map("committee_id")
+  committee   Committee?    @relation(fields: [committeeId], references: [id])
+  status      MeetingStatus @default(SCHEDULED)
+  agendaItems AgendaItem[]
+  minutes     MeetingMinutes?
+  decisions   MeetingDecision[]
+  actionItems ActionItem[]
+  attendees   MeetingAttendee[]
+  createdById String        @map("created_by_id")
+  createdBy   User          @relation("MeetingCreator", fields: [createdById], references: [id])
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  @@index([meetingDate])
+  @@index([committeeId])
+  @@map("meetings")
+}
+
+model AgendaItem {
+  id          String   @id @default(uuid())
+  meetingId   String   @map("meeting_id")
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  title       String
+  description String?
+  order       Int
+  duration    Int?
+  presenter   String?
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("agenda_items")
+}
+
+model MeetingMinutes {
+  id         String    @id @default(uuid())
+  meetingId  String    @unique @map("meeting_id")
+  meeting    Meeting   @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  content    String
+  recordedBy String    @map("recorded_by")
+  approvedAt DateTime? @map("approved_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  @@map("meeting_minutes")
+}
+
+model MeetingDecision {
+  id          String   @id @default(uuid())
+  meetingId   String   @map("meeting_id")
+  meeting     Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  description String
+  decisionRef String?  @map("decision_ref")
+  ownerId     String?  @map("owner_id")
+  dueDate     DateTime? @map("due_date")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@map("meeting_decisions")
+}
+
+model ActionItem {
+  id          String           @id @default(uuid())
+  meetingId   String           @map("meeting_id")
+  meeting     Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  description String
+  assigneeId  String?          @map("assignee_id")
+  dueDate     DateTime?        @map("due_date")
+  status      ActionItemStatus @default(OPEN)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  @@map("action_items")
+}
+
+model MeetingAttendee {
+  id        String  @id @default(uuid())
+  meetingId String  @map("meeting_id")
+  meeting   Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  userId    String  @map("user_id")
+  user      User    @relation("MeetingAttendees", fields: [userId], references: [id])
+  attended  Boolean @default(false)
+
+  @@unique([meetingId, userId])
+  @@map("meeting_attendees")
 }
