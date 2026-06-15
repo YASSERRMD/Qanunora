@@ -59,6 +59,7 @@ import { SsoModule } from './modules/sso/sso.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { RegistryAdaptersModule } from './modules/registry-adapters/registry-adapters.module';
 import { GazetteModule } from './modules/gazette/gazette.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
   imports: [
@@ -125,6 +126,7 @@ import { GazetteModule } from './modules/gazette/gazette.module';
     IntegrationsModule,
     RegistryAdaptersModule,
     GazetteModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [

@@ -2000,3 +2000,29 @@ model GazetteChecklist {
 
   @@map("gazette_checklist")
 }
+
+// ============================================================
+// ADVANCED ANALYTICS AND BI
+// ============================================================
+
+model AnalyticsSnapshot {
+  id           String   @id @default(uuid())
+  snapshotDate DateTime @unique
+  metrics      Json
+  createdAt    DateTime @default(now())
+
+  @@map("analytics_snapshots")
+}
+
+model KpiDefinition {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  name        String
+  description String?
+  unit        String?
+  targetValue Float?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  @@map("kpi_definitions")
+}
