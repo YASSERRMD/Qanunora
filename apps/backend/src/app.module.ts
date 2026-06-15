@@ -48,6 +48,7 @@ import { AiTranslationModule } from './modules/ai-translation/ai-translation.mod
 import { GlossaryModule } from './modules/glossary/glossary.module';
 import { DocumentEditorModule } from './modules/document-editor/document-editor.module';
 import { RedliningModule } from './modules/redlining/redlining.module';
+import { CollaborationModule } from './modules/collaboration/collaboration.module';
 
 @Module({
   imports: [
@@ -103,6 +104,7 @@ import { RedliningModule } from './modules/redlining/redlining.module';
     GlossaryModule,
     DocumentEditorModule,
     RedliningModule,
+    CollaborationModule,
   ],
   controllers: [AppController],
   providers: [

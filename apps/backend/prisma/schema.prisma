@@ -257,6 +257,8 @@ model User {
   editorComments         EditorComment[] @relation("EditorCommentAuthor")
   proposedRedlines       RedlineChange[] @relation("RedlineProposer")
   reviewedRedlines       RedlineChange[] @relation("RedlineReviewer")
+  documentLocks          DocumentLock[]  @relation("DocumentLockUser")
+  autosaveSnapshots      AutosaveSnapshot[] @relation("AutosaveUser")
 
   @@map("users")
 }
@@ -1311,6 +1313,34 @@ model TranslationRequest {
   @@index([status])
   @@index([createdById])
   @@map("translation_requests")
+}
+
+// ============================================================
+// REAL-TIME COLLABORATION
+// ============================================================
+
+model DocumentLock {
+  id                String   @id @default(uuid())
+  legislativeItemId String   @unique
+  lockedById        String
+  lockedBy          User     @relation("DocumentLockUser", fields: [lockedById], references: [id])
+  lockedAt          DateTime @default(now())
+  expiresAt         DateTime
+  sessionId         String?
+
+  @@map("document_locks")
+}
+
+model AutosaveSnapshot {
+  id                String   @id @default(uuid())
+  legislativeItemId String
+  content           String
+  savedById         String
+  savedBy           User     @relation("AutosaveUser", fields: [savedById], references: [id])
+  savedAt           DateTime @default(now())
+
+  @@index([legislativeItemId])
+  @@map("autosave_snapshots")
 }
 
 // ============================================================
