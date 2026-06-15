@@ -52,6 +52,7 @@ import { CollaborationModule } from './modules/collaboration/collaboration.modul
 import { SearchFacetsModule } from './modules/search-facets/search-facets.module';
 import { WorkspaceModule } from './modules/workspace/workspace.module';
 import { AdvancedAuditModule } from './modules/advanced-audit/advanced-audit.module';
+import { DataRetentionModule } from './modules/data-retention/data-retention.module';
 
 @Module({
   imports: [
@@ -111,6 +112,7 @@ import { AdvancedAuditModule } from './modules/advanced-audit/advanced-audit.mod
     SearchFacetsModule,
     WorkspaceModule,
     AdvancedAuditModule,
+    DataRetentionModule,
   ],
   controllers: [AppController],
   providers: [
