@@ -125,6 +125,15 @@ enum NotificationType {
   SYSTEM
 }
 
+enum EventType {
+  REVIEW_DEADLINE
+  CONSULTATION_DEADLINE
+  COMMITTEE_MEETING
+  APPROVAL_DUE
+  SUBMISSION_DEADLINE
+  OTHER
+}
+
 enum AuditAction {
   CREATE
   UPDATE
@@ -213,6 +222,8 @@ model User {
   chatSessions          ChatSession[]
   createdAmendments     Amendment[]            @relation("AmendmentProposedBy")
   approvedAmendments    Amendment[]            @relation("AmendmentApprovedBy")
+  assignedCalendarEvents CalendarEvent[]       @relation("EventAssignee")
+  createdCalendarEvents  CalendarEvent[]       @relation("EventCreator")
 
   @@map("users")
 }
@@ -321,6 +332,7 @@ model LegislativeItem {
   regulatoryRefs   RegulatoryReference[]
   traceLinks       TraceLink[]
   chatSessions     ChatSession[]
+  calendarEvents   CalendarEvent[]
 
   @@index([status])
   @@index([type])
@@ -765,4 +777,33 @@ model SystemSetting {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("system_settings")
+}
+
+// ============================================================
+// CALENDAR EVENTS
+// ============================================================
+
+model CalendarEvent {
+  id                String    @id @default(uuid())
+  title             String
+  description       String?
+  eventType         EventType @map("event_type")
+  startDate         DateTime  @map("start_date")
+  endDate           DateTime? @map("end_date")
+  allDay            Boolean   @default(false) @map("all_day")
+  legislativeItemId String?   @map("legislative_item_id")
+  legislativeItem   LegislativeItem? @relation(fields: [legislativeItemId], references: [id])
+  assignedToId      String?   @map("assigned_to_id")
+  assignedTo        User?     @relation("EventAssignee", fields: [assignedToId], references: [id])
+  remindAt          DateTime? @map("remind_at")
+  isCompleted       Boolean   @default(false) @map("is_completed")
+  createdById       String    @map("created_by_id")
+  createdBy         User      @relation("EventCreator", fields: [createdById], references: [id])
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+
+  @@index([startDate])
+  @@index([eventType])
+  @@index([assignedToId])
+  @@map("calendar_events")
 }

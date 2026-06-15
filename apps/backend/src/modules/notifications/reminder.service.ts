@@ -3,6 +3,16 @@ import { PrismaService } from '../database/prisma.service';
 import { NotificationsService } from './notifications.service';
 import { NotificationType, LegislativeStatus } from '@prisma/client';
 
+// Calendar reminder payload (subset of CalendarEvent)
+interface CalendarReminder {
+  id: string;
+  title: string;
+  startDate: Date;
+  remindAt: Date | null;
+  assignedTo?: { id: string } | null;
+  createdBy: { id: string };
+}
+
 @Injectable()
 export class ReminderService {
   private readonly logger = new Logger(ReminderService.name);
@@ -114,15 +124,56 @@ export class ReminderService {
     }
   }
 
-  async scheduleReminders(): Promise<{ consultationCount: number; reviewCount: number }> {
+  async checkCalendarReminders(): Promise<void> {
+    const dueEvents = await (this.prisma.calendarEvent.findMany({
+      where: {
+        remindAt: { lte: new Date() },
+        isCompleted: false,
+      },
+      select: {
+        id: true,
+        title: true,
+        startDate: true,
+        remindAt: true,
+        assignedTo: { select: { id: true } },
+        createdBy: { select: { id: true } },
+      },
+      orderBy: { remindAt: 'asc' },
+    }) as Promise<CalendarReminder[]>);
+
+    for (const event of dueEvents) {
+      const recipientIds = new Set<string>();
+      if (event.assignedTo) recipientIds.add(event.assignedTo.id);
+      recipientIds.add(event.createdBy.id);
+
+      for (const userId of recipientIds) {
+        await this.notificationsService.create(
+          userId,
+          NotificationType.REVIEW_REMINDER,
+          `Deadline Reminder: ${event.title}`,
+          `Event "${event.title}" is due on ${event.startDate.toLocaleDateString()}.`,
+          'CalendarEvent',
+          event.id,
+        );
+      }
+
+      this.logger.log(`Sent calendar reminder for event ${event.id}: "${event.title}"`);
+    }
+  }
+
+  async scheduleReminders(): Promise<{ consultationCount: number; reviewCount: number; calendarCount: number }> {
     this.logger.log('Running reminder checks...');
     const before = await this.getNotificationCountSnapshot();
     await this.checkConsultationDeadlines();
     await this.checkReviewReminders();
+    const calendarBefore = await this.prisma.notification.count({ where: { type: NotificationType.REVIEW_REMINDER } });
+    await this.checkCalendarReminders();
+    const calendarAfter = await this.prisma.notification.count({ where: { type: NotificationType.REVIEW_REMINDER } });
     const after = await this.getNotificationCountSnapshot();
     return {
       consultationCount: Math.max(0, after.consultation - before.consultation),
       reviewCount: Math.max(0, after.review - before.review),
+      calendarCount: Math.max(0, calendarAfter - calendarBefore),
     };
   }
 
